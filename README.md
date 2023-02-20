@@ -108,38 +108,11 @@ AEONF mk6  | Analog Watch
 
 Easy isn't it? Here is the detailed step:
 
-First LED | Second LED | Third LED (Sqeuence)
+# | Sequence | Note
 ------------- | ------------- | -------------
-<img style="filter: none;" src="https://github.com/triqadafi/TQDF_WatchOS/raw/master/images/watch_normal_step1.jpg" alt="Current Device" width="200"> | <img style="filter: none;" src="https://github.com/triqadafi/TQDF_WatchOS/raw/master/images/watch_normal_step2.jpg" alt="Current Device" width="200"> | <img style="filter: none;" src="https://github.com/triqadafi/TQDF_WatchOS/raw/master/images/watch_normal_step3.jpg" alt="Current Device" width="200">
-First LED represents the HOUR. <br/><br/><br/><br/><br/><br/>Read as `10`. So it is `10:MM`<br/>. | Second LED represents the MINUTE. To be clear, it's actually **represent the clock long needle**. So the value shown is a **multiple of 5**. <br/><br/>Read as `3` then become `3*5=15`. So it is `10:15`. | The next LED sequence is to show the minute accuracy. There are 3 extra steps after the MINUTE LED. So the time is `10:15` <b>`+3`</b>.<br/><br/><br/><br/>
-<!-- prettier-ignore -->
-<table>
-  <thead>
-    <tr>
-      <th width="250px"> First LED</th>
-      <th width="250px">Second LED</th>
-      <th width="250px">Third LED (Sqeuence)</th>
-    </tr>
-  </thead>
-  <tbody>
-  <tr>
-    <td><img style="filter: none;" src="https://github.com/triqadafi/TQDF_WatchOS/raw/master/images/watch_normal_step1.jpg" alt="Current Device" width="200">
-    </td>
-    <td><img style="filter: none;" src="https://github.com/triqadafi/TQDF_WatchOS/raw/master/images/watch_normal_step2.jpg" alt="Current Device" width="200">
-    </td>
-    <td><img style="filter: none;" src="https://github.com/triqadafi/TQDF_WatchOS/raw/master/images/watch_normal_step3.jpg" alt="Current Device" width="200">
-    </td>
-  </tr>
-  <tr>
-    <td>First LED represents the HOUR. <br/><br/><br/><br/><br/><br/>Read as `10`. So it is `10:MM`<br/>.
-    </td>
-    <td>Second LED represents the MINUTE. To be clear, it's actually **represent the clock long needle**. So the value shown is a **multiple of 5**. <br/><br/>Read as `3` then become `3*5=15`. So it is `10:15`.
-    </td>
-    <td>The next LED sequence is to show the minute accuracy. There are 3 extra steps after the MINUTE LED. So the time is `10:15` <b>`+3`</b>.<br/><br/><br/><br/>
-    </td>
-  </tr>
-  </tbody>
-</table>
+1 | <img style="filter: none;" src="https://github.com/triqadafi/TQDF_WatchOS/raw/master/images/watch_normal_step1.jpg" alt="Current Device" width="200"> | First LED represents the HOUR. <br/><br/><br/><br/><br/><br/>Read as `10`. So it is `10:MM`<br/>.
+2 | <img style="filter: none;" src="https://github.com/triqadafi/TQDF_WatchOS/raw/master/images/watch_normal_step2.jpg" alt="Current Device" width="200"> | Second LED represents the MINUTE. To be clear, it's actually **represent the clock long needle**. So the value shown is a **multiple of 5**. <br/><br/>Read as `3` then become `3*5=15`. So it is `10:15`.
+3 | <img style="filter: none;" src="https://github.com/triqadafi/TQDF_WatchOS/raw/master/images/watch_normal_step3.jpg" alt="Current Device" width="200">| The next LED sequence is to show the minute accuracy. There are 3 extra steps after the MINUTE LED. So the time is `10:15` <b>`+3`</b>.<br/><br/><br/><br/> 
 
 <b><center>The result it `10:18`</center></b>
 
