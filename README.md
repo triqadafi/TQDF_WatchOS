@@ -44,7 +44,7 @@ In this period, the Library only supported the `AEONF_mark_6`.
 
 Top Side  | Back Side  | <div style="width:150px">Legend</div>
 ------------- | ------------- | -------------
-<img style="filter: none;" src="hardware_top.jpg" alt="Hardware Top">  | <img style="filter: none;" src="hardware_bottom.jpg" alt="Hardware Bottom">  | 1. MCU <br/>2. LED<br/> 3. Test<br/> 4. Test<br/><br/><br/>
+<img style="filter: none;" src="https://github.com/triqadafi/TQDF_WatchOS/raw/master/images/hardware_top.jpg" alt="Hardware Top">  | <img style="filter: none;" src="https://github.com/triqadafi/TQDF_WatchOS/raw/master/images/hardware_bottom.jpg" alt="Hardware Bottom">  | 1. MCU <br/>2. LED<br/> 3. Test<br/> 4. Test<br/><br/><br/>
 
 Specification:
 - Case: Acrylic 
