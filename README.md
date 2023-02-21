@@ -1,5 +1,5 @@
 <!-- src=" -->
-# Getting Started
+# Getting Started {#getting-started}
 
 [TOC]
 <b>`AEONF_mk6`</b> is short of digital watch with a 12-bit LED arranged to act as an analog watch. It's actually a development board, but it serves the purpose of performing like ***"an ordinary wristwatch"***. The device is `Arduino compatible board`. This means, the firmware can be reprogrammed by Arduino IDE. Most of the process follows the Arduino IDE standard.
@@ -10,7 +10,7 @@ Here is some summary:
  - Ofcourse it can work as normal wristwatch. 🥳
  - The device can do ***Lato-lato*** things. 😁
  - This watch is **built with a custom bootloader**. In simple words, you can reprogram it just by connecting it to the USB port 😮
- - **Optimized deep sleep**. It can reach lower than 1 mA!!! It never dies. 😴
+ - **Optimized deep sleep**. It can reach lower than 1 uA!!! It never dies. 😴
  - The RTC is **calibrated with Rubidium Oscillator**. It can reach **10-30 seconds/month!** 😎
  - It has a watchdog! 🐺 😈 🤖 👽
  - Standby LED for more attraction!
@@ -44,7 +44,7 @@ In this period, the Library only supported the `AEONF_mark_6`.
 
 Top Side  | Back Side  | <div style="width:150px">Legend</div>
 ------------- | ------------- | -------------
-<img style="filter: none;" src="https://github.com/triqadafi/TQDF_WatchOS/raw/master/images/hardware_top.jpg" alt="Hardware Top">  | <img style="filter: none;" src="https://github.com/triqadafi/TQDF_WatchOS/raw/master/images/hardware_bottom.jpg" alt="Hardware Bottom">  | 1. MCU <br/>2. LED<br/> 3. Test<br/> 4. Test<br/><br/><br/>
+<img style="filter: none;" src="https://github.com/triqadafi/TQDF_WatchOS/raw/master/images/1x/hardware_top.jpg" alt="Hardware Top">  | <img style="filter: none;" src="https://github.com/triqadafi/TQDF_WatchOS/raw/master/images/1x/hardware_bottom.jpg" alt="Hardware Bottom">  | 1. MCU <br/>2. LED<br/> 3. Test<br/> 4. Test<br/><br/><br/>
 
 Specification:
 - Case: Acrylic 
@@ -231,15 +231,15 @@ I guess, you stats to become familiar with the terms, Let's gooo!
 
 <hr/>
 
-# Get Ready to Upload the Program
+# Get Ready to Upload the Program {#get-ready-to-upload-the-program}
 
 If you haven't done so already, download Arduino IDE from [the software page](https://www.arduino.cc/en/software). You can find [installation instructions here](https://support.arduino.cc/hc/en-us/articles/360019833020). If you already have Arduino IDE installed, uploading a sketch is quick and easy, but let's take a look at what we need to do in just a few minutes.
 1. You need to Setting Up the Arduino IDE
-    - [Installing Core](#installing-core-via-board-manager)
+    - [Installing Core](#installing-core)
     - [Installing Library](#installing-library)
 2. Then you can do the [Upload](#lets-upload-some-example) process
 
-## Installing Core (via Board Manager)
+## Installing Core (via Board Manager) {#installing-core}
 This installation method requires Arduino IDE version 1.6.4 or greater.
 * Open the Arduino IDE.
 * Open the **File > Preferences** menu item.
@@ -257,7 +257,7 @@ This installation method requires Arduino IDE version 1.6.4 or greater.
 
 > By installing this core, you can run any Arduino-like program or some STM32duino program. You can start to build your own firmware. But wait, we may use the library to make the development super fast. 
 
-## Installing Library
+## Installing Library {#installing-library}
 
 The library can be installed using the [standard Arduino library install procedure](http://arduino.cc/en/Guide/Libraries)
 
@@ -272,7 +272,7 @@ And we are ready to program some example.
 
 <hr/>
 
-## Let's Upload some Example
+## Let's Upload some Example {#lets-upload-some-example}
 
 1. Write a sketch, or use an Example such as Blink (**File > Examples > 01.Basics > Blink**).
 2. Connect the device to any PC by using MicroUSB.
@@ -347,12 +347,17 @@ The Watchdog has a special rule. It may wake up the device without any user inte
 # Bootloader
 The Bootloader used was specifically built for the **TQDFCore** and **WatchOS**. It may have a different standard compared with the usual STM32 Bootloader. It's reliable and versatile. I always found it to succeed. So **I need your help to see it fail** 😝
 
-## How to enter the Bootloader?
+## How to enter the Bootloader? {#how-to-enter-the-bootloader}
 1. Make sure WatchOS is implemented on the device.
 2. Connect the device to any PC by using MicroUSB
 3. Hold the button until the device is doing Lato-lato things.
 4. Serial COM port will appear on the PC.
 5. Upload program just like usual day using Arduino IDE (Make sure to configure the COM Port correctly)
+
+## How to force exit the Bootloader? {#how-to-force-exit-the-bootloader}
+1. When the LED C flashing quickly, Press and hold the button
+2. wait until LED C stops flashing (solid)
+3. Release the button
 
 <hr/>
 
@@ -361,7 +366,53 @@ The Bootloader used was specifically built for the **TQDFCore** and **WatchOS**.
 ## How to recover the "bricked" device?
 On paper, there is no way you can brick the device when using this custom bootloader, but who knows? There is always a possibility. Contact me for some workaround to fix this. There is a way, but it still needs to be documented.
 
+## How to force exit the Bootloader?
+In a rare case the LED C of the watch suddenly flashing rapidly. This indicates we are in bootloader mode. We need to force quit bootloader for a normal operation. Just follow [How to force exit the Bootloader?](#how-to-force-exit-the-bootloader)
 
+
+<hr/>
+<!-- https://unicode.org/emoji/charts/full-emoji-list.html -->
+
+
+# Beta Testing Agreement and Goals
+
+Please understand the terms explained below if you are willing to join the beta testing phase. This beta testing aims to understand the user limitation, not make it look complicated, and not to classify the tester as a newbie or an expert in programming. Every goals is adjusted by testers, everyone with any background may join the beta.
+
+Before joining this beta, please take a look at
+- [Getting Started](#getting-started) until [Get Ready to Upload the Program](#get-ready-to-upload-the-program)
+- [Class Documentation](@ref TQDF_WatchOS)
+
+Then you may decide to continue or not .
+
+## The Testing Package
+
+You will get
+- 1x Watch AEONF mk6 Board 
+- 1x Acrylic Casing
+- 1x Standard wristwatch spring bar (for the strap)
+- 1x Wristwatch spring bar ejector
+- 1x Battery
+
+You will need
+- 1x 22mm watch strap (not mandatory)
+- 1x Micro USB Cable
+
+## Testing Goals
+- Find a way to install the 22mm strap (if you want to wear it)
+- Configuring the ArduinoIDE
+- Upload the full program (Located at Example)
+- Take a look at the class documentation
+
+If these goals are too easy, you may:
+- Create a simple LED-related program based on your level of understanding (just a blink, combination with a button press, using RTC) or anything related. See 
+
+## Please understand 
+- No firmware implemented. (It just shipped with the bare minimum firmware, the mighty "blink" program, testers need to find a way to implement the program)
+- Testing device is just for testing. They are separated from main development channel. These testing devices will be blacklisted after certain period of time.
+- The test may introduce the worse user experience possible. Every testing goal has been documented on this page. Testers need to understand it. 
+- **The documentation is not final**, it will be updated along with testing phase. But don't worry, I'll take full responsibility for giving full support during the testing phase. Any form of suggestion and questions are really appreciated.
+- No strap included. But here are some examples of the strap that I use.
+<img src="https://github.com/triqadafi/TQDF_WatchOS/raw/master/images/strap_example.png" alt="Strap 22mm Example" width="175">
 
 <hr/>
 
@@ -369,5 +420,11 @@ On paper, there is no way you can brick the device when using this custom bootlo
 - My Instagram: [@triqadafi](http://instagram.com/triqadafi)
 - My Website: [triqada.fi](http://triqada.fi)
 
-<hr/>
-<!-- https://unicode.org/emoji/charts/full-emoji-list.html -->
+Thank you!
+
+
+<!-- 
+
+Beware of polaryty emoji
+Beberapa yang ditambahkan masih bahasa indonesia
+ -->
