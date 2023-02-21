@@ -44,7 +44,7 @@ In this period, the Library only supported the `AEONF_mark_6`.
 
 Top Side  | Back Side  | <div style="width:150px">Legend</div>
 ------------- | ------------- | -------------
-<img style="filter: none;" src="https://github.com/triqadafi/TQDF_WatchOS/raw/master/images/1x/hardware_top.jpg" alt="Hardware Top">  | <img style="filter: none;" src="https://github.com/triqadafi/TQDF_WatchOS/raw/master/images/1x/hardware_bottom.jpg" alt="Hardware Bottom">  | 1. MCU <br/>2. LED<br/> 3. Test<br/> 4. Test<br/><br/><br/>
+<img style="filter: none;" src="https://github.com/triqadafi/TQDF_WatchOS/raw/master/images/hardware_top.png" alt="Hardware Top">  | <img style="filter: none;" src="https://github.com/triqadafi/TQDF_WatchOS/raw/master/images/hardware_bottom.png" alt="Hardware Bottom">  | 1. PCB Marking <br/>2. Button<br/> 3. LED 0805<br/> 4. MCU<br/> 5. Back Cover<br/> 6. RESET<br/> 7. BOOT<br/> 8. Micro USB<br/> 9. SWD Programming<br/><br/><br/>
 
 Specification:
 - Case: Acrylic 
@@ -76,7 +76,7 @@ Firmware:
 The 3 things below are the recommended steps to try before we are going further. If there are failures, please let me know. Just do it, it takes few seconds.
 ## Powering up the device
 1. Open the back cover
-2. Insert the coin cell battery (beware of the polarity)
+2. Insert the coin cell battery (⛔ beware of the polarity ⛔)
 
 ## Entering the Bootloader
 1. Connect the device to any PC by using MicroUSB
@@ -345,7 +345,7 @@ The Watchdog has a special rule. It may wake up the device without any user inte
 <hr/>
 
 # Bootloader
-The Bootloader used was specifically built for the **TQDFCore** and **WatchOS**. It may have a different standard compared with the usual STM32 Bootloader. It's reliable and versatile. I always found it to succeed. So **I need your help to see it fail** 😝
+The Bootloader used was specifically built for the **TQDFCore** and **WatchOS**. It may have a different standard compared with the usual STM32 Bootloader. It's reliable and versatile. I always found it to succeed. So **I need your help to see it fail** 😝. 
 
 ## How to enter the Bootloader? {#how-to-enter-the-bootloader}
 1. Make sure WatchOS is implemented on the device.
@@ -355,8 +355,9 @@ The Bootloader used was specifically built for the **TQDFCore** and **WatchOS**.
 5. Upload program just like usual day using Arduino IDE (Make sure to configure the COM Port correctly)
 
 ## How to force exit the Bootloader? {#how-to-force-exit-the-bootloader}
-1. When the LED C flashing quickly, Press and hold the button
-2. wait until LED C stops flashing (solid)
+In very rare case, the program stuck on the bootloader indicated by LED C blinking quickly. Follow this guide to exit the bootloader.
+1. Press and hold the button
+2. wait until LED C stops blinking (solid)
 3. Release the button
 
 <hr/>
@@ -366,8 +367,8 @@ The Bootloader used was specifically built for the **TQDFCore** and **WatchOS**.
 ## How to recover the "bricked" device?
 On paper, there is no way you can brick the device when using this custom bootloader, but who knows? There is always a possibility. Contact me for some workaround to fix this. There is a way, but it still needs to be documented.
 
-## How to force exit the Bootloader?
-In a rare case the LED C of the watch suddenly flashing rapidly. This indicates we are in bootloader mode. We need to force quit bootloader for a normal operation. Just follow [How to force exit the Bootloader?](#how-to-force-exit-the-bootloader)
+## LED C is blinking rapidly?
+In a rare case the LED C of the watch suddenly blinking rapidly. This indicates we are in bootloader mode. We need to force quit bootloader for a normal operation. Just follow [How to force exit the Bootloader?](#how-to-force-exit-the-bootloader)
 
 
 <hr/>
