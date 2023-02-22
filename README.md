@@ -26,7 +26,7 @@ Here is some summary:
  - [v] Calibrated
  - -->
 
-That such amazing result is packed in this `WatchOS` library. This is a kind of Operating System library used by `AEONF_mk6` to accelerate the development process. It manages various initialization and functions required to develop the "Watch".
+That such amazing result is packed in this `TQDF_WatchOS` library. This is a kind of Operating System library used by `AEONF mark 6` to accelerate the development process. It manages various initialization and functions required to develop the "Watch".
 
 ## Wait, Do I Need to develop the software by myself?
 Back in the day, when I started developing this device, The main goal was to  "acquaint" with the hardware programming environment, i.e., Arduino IDE. Now the plan remains the same. You must try to... or at least do "Upload the program". Believe me, there are just some simple steps you need to understand. 

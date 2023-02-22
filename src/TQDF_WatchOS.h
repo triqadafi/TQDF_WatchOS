@@ -34,7 +34,9 @@ class TQDF_WatchOS
      * @brief Represent the possible routine for the WATCHDOG. Used by WATCHDOG_setRoutine()
      * 
      */
-    enum WATCHDOG_wake_interval : uint8_t {
+    enum WATCHDOG_routine : uint8_t {
+      /// Disable wake routine
+      WAKE_DISABLED,
       /// 1 Second (Beware if you using 1 second interval with shutdown)
       WAKE_EVERY_1S,
       /// 5 Second
@@ -101,15 +103,27 @@ class TQDF_WatchOS
      * Real Time Clock (RTC) calbration value from the manufacturer.
      * Each device has a different calbration value. 
      * This calibration value written on the PCB or any information from the manufacturer.
+     * @param interval Represents the routine interval. When device is shutdown it will wake up the device base on the interval.
      * 
      * @param pins Clock pins. Pointer to an array with 12 byte width
      * @param power_pin MOSFET gate pin to power up the LED. (PWM Capable)
+     * @param button_pin
      * @param pins_unused Threated differently. Pointer to an array with 20 byte width.
      * Make sure they are no floating. All unused pins should be listed on pins_unused. Floating pins means more power consumtion.
      * @note This function should be called directly right after the setup(). 
      * Make sure there are no initialization function that called before this function to guarantee the Operating System run smoothly
      */
-    void config(int baudrate, bool preserve_RTC, long calibration_value, int *pins, int power_pin, int button_pin, int *pins_unused);
+    void config(
+      int baudrate, 
+      bool preserve_RTC, 
+      long calibration_value, 
+      WATCHDOG_routine watchdog_routine, 
+
+      int *pins, 
+      int power_pin, 
+      int button_pin, 
+      int *pins_unused
+    );
     
 
     void logic(uint8_t logic_led, uint8_t logic_led_power, uint8_t logic_button);
@@ -197,14 +211,11 @@ class TQDF_WatchOS
     void LED_test_deadlock();
 
     /**
-     * @brief Function to lock the loop. Better for debugging application
+     * @brief Count the number of active/turned on LED.
      * @param None
-     * @return None
-     * @note 
-     * When the function is called, the program will stuck in the function forever.
-     * Inidicated by a rondom LED ON and OFF animation.
+     * @return Numver of turned on LED.
      */
-    void LED_show();
+    int LED_count();
     
     /**
      * @brief Clear means to turn off all of the LED or any clock pin
@@ -398,18 +409,29 @@ class TQDF_WatchOS
      */
     uint32_t REGISTER_read(uint32_t BackupRegister, REGISTER_location location);
 
-
     /**
-     * @brief Set the WATCHDOG routine. For example the device is shutdown it will wake up the device base on the interval.
-     * @param interval Represents the routine interval.
-     * @param forced_on Set the register ON. Usefull to make sure the register is SET on the first time.
+     * @brief Set the WATCHDOG wake up routine flag. 
+     * @param flag Set true to enable wake up and false to disable. Usefull to make sure the register is SET on the first time.
      * @return None
      * @note This is the function to create a standby LED. Basically this function tells the WATCHDOG to wake from shutdown state.
      * When the device is waked up by WATCHDOG routing it will enter the loop and execute program normaly.
      * @see shutdown()
      * 
      */
-    void WATCHDOG_setRoutine(WATCHDOG_wake_interval interval, bool forced_on);
+    void WATCHDOG_setWakeUpFlag(bool flag);
+
+    /**
+     * @brief Allow to reconfigure (enable or disable) the WATCHDOG wake up routine on the fly.
+     * @param enable Set true to enable wake up reconfiguration menu
+     * @return None
+     * @note Wake up configuration menu is accessed right after lato-lato mode. 
+     * Just keep pressing the button after minimal 3 lato-lato cycle.
+     * Release the button ffter these 3 cycles reached. The wake up enable bit will be flipped (enable become disable and disable become enable).
+     * If there are LED blinks after you release the button, it means that the WATCHDOG wake up is ENABLED
+     * Of there is not LED blink, it means that the WATCHDOG wake up is DISABLED
+     * 
+     */
+    void WATCHDOG_reconfigureWakeUp(bool enable);
     
     /**
      * @brief Check if the wake up source comes from WATCHDDOG. For example the device is shutdown it will wake up the device base on the interval.
@@ -423,10 +445,11 @@ class TQDF_WatchOS
      * @see shutdown()
      * 
      */
-    bool WATCHDOG_isWakeUp();
-
     bool WATCHDOG_isInterruptFlag();
+
     void WATCHDOG_clearInterruptFlag();
+    void WATCHDOG_setRoutine(WATCHDOG_routine watchdog_routine);
+    void WATCHDOG_disableInterrupt();
 
     unsigned long getUID(int index);
   private:
@@ -451,6 +474,7 @@ class TQDF_WatchOS
     void LED_dynamic();
     void LED_activate();
     void LED_deactivate();
+    void LED_show();
 
     // BUTTON_isSafePressed
     bool BUTTON_state_last = false;
@@ -479,16 +503,15 @@ class TQDF_WatchOS
     void POWER_begin();
 
     int WATCHDOG_latolato_counter = 0;
-    bool WATCHDOG_latolato_called = false;
     bool WATCHDOG_setRoutine_called = false;
     bool WATCHDOG_wake_isRunning = false;
-    WATCHDOG_wake_interval WATCHDOG_interval;
+    WATCHDOG_routine WATCHDOG_interval;
     int WATCHDOG_encrypted_a = 0;
     int WATCHDOG_LED[12] = {0};
     unsigned long WATCHDOG_millis;
     static volatile bool WATCHDOG_elapsed_interrupt_flag;
+    bool WATCHDOG_interrupt_first = false;
     void WATCHDOG_begin();
-    void WATCHDOG_disableInterrupt();
     static void ISR_WATCHDOG_handler (void *data);
 };
 

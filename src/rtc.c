@@ -904,6 +904,7 @@ void attachSecondsIrqCallback(voidCallbackPtr func, uint32_t wake_counter)
 
 #endif /* STM32F1xx */
   /* enable the IRQ that will trig the one-second interrupt */
+  HAL_NVIC_SetPriority(ONESECOND_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(ONESECOND_IRQn);
 }
 
