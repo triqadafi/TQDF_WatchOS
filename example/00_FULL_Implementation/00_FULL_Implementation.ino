@@ -4,9 +4,9 @@
  * REAL IMPLEMENTATION (FULL)
  */
 /* USER DEFINE */
-// #define DISPLAY_MODE 0 // NORMAL
+#define DISPLAY_MODE 0 // NORMAL
 // #define DISPLAY_MODE 1 // DECIMAL 1
-#define DISPLAY_MODE 2 // DECIMAL 2
+// #define DISPLAY_MODE 2 // DECIMAL 2
 // #define USE_SECOND
 
 #define DEBUG_F_ENABLE true

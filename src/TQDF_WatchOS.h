@@ -97,7 +97,7 @@ class TQDF_WatchOS
     /**
      * @brief Configure device basic parameters. Responsible for all peripheral initialization.
      * 
-     * @param baudrate UARD baudrate (Recommended 9600 ar 115200)
+     * @param baudrate UART baudrate (Recommended 9600 ar 115200)
      * @param preserve_RTC Keep the last value. RTC will not reset even after programmed. Only POWER_OFF resets the RTC.
      * @param calibration_value 
      * Real Time Clock (RTC) calbration value from the manufacturer.
@@ -136,23 +136,6 @@ class TQDF_WatchOS
      * @note This function will not triggering the RTC_initialTime() and RTC_initialDate(). It will keep the RTC datetime same as before.
      */
     void reset();
-
-    /**
-     * @brief Main program
-     * @param None
-     * @return None
-     * @note 
-     * Just keeps the program clean. 
-     * This function uses the loop() as part of the main program iteration.
-     * Works like usual Arduino-like programming.
-     * This function handles various operating system initialization.
-     * There are some initialization in the program and some of them must be done sequentially to avoid deadlock.
-     * I found it to be less-possible to be left up to the user as it will only add to the confusion. 
-     * 
-     * 
-     * 
-     */
-    void main();
 
     /**
      * @brief Simply just shutdown the device keep the WATCHDOG and Real Time Clock (RTC) running
@@ -498,9 +481,9 @@ class TQDF_WatchOS
     // [4] Month 
     // [5] Year
     void RTC_begin();
-    bool RTC_isInitialRun();
 
     void POWER_begin();
+    bool POWER_isInitialRun = false;
 
     int WATCHDOG_latolato_counter = 0;
     bool WATCHDOG_setRoutine_called = false;
