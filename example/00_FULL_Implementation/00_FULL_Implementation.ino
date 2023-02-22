@@ -4,14 +4,19 @@
  * REAL IMPLEMENTATION (FULL)
  */
 /* USER DEFINE */
-#define DEBUG_T_ENABLE true
+// #define DISPLAY_MODE 0 // NORMAL
+// #define DISPLAY_MODE 1 // DECIMAL 1
+#define DISPLAY_MODE 2 // DECIMAL 2
+// #define USE_SECOND
+
+#define DEBUG_F_ENABLE true
 
 // FSM CONFIG
 #define FSM_ALIVE_MS 30000 // when entering config exit after 30s inactivity
 
 /* END USER DEFINE*/
 
-#include "TQDF_WatchOS_STM32.h"
+#include "TQDF_WatchOS.h"
 #include "config_AEONF_mk6.h"
 
 /* USER VARIABLE */
@@ -37,42 +42,55 @@ int CONFIG_CLOCK_second = 0;
 /* END USER VARIABLE*/
 
 void setup() {
-  WatchOS.begin(
-    /* Serial Baudrate:  */ 9600, // 9600 or 115200
+  WatchOS.config(
+    /* Serial Baudrate:  */ 115200, // 9600 or 115200
+    /* RTC Preserved     */ true, 
+    /* RTC Callibration: */ 0x6EF, // From manufacturer (back of the PCB)
+    /* WATCHDOG Routine  */ WatchOS.WAKE_EVERY_10S,
+    /* GPIO -------------------------------------------------------------------*/ 
     /* Clock pin (1-12): */ led_clock_pins, 
     /* LED Power pin:    */ led_power_pin, 
     /* Button pin:       */ button_pin, 
     /* Unused pins:      */ unused_pins
   );
   /* USER SETUP CODE 1*/
-  WatchOS.WATCHDOG_wake(WAKE_EVERY_10S);
+  WatchOS.WATCHDOG_reconfigureWakeUp(true);
+  WatchOS.LED_setBrightnessMax(1);
 
-  WatchOS.RTC_setTime(10, 14, 0);
-  WatchOS.RTC_setDate(17, 8, 23);
+  WatchOS.RTC_initialTime(11,25,30);
 
   /* END USER SETUP CODE 1*/
-  WatchOS.SCHEDULER_run();
 }
-
 /* USER APP CODE 1*/
 
 void loop() {
   // ------------------------------------------------------------
   // STANDBY LED
   // ------------------------------------------------------------
-  if (WatchOS.WATCHDOG_isWakeUp()){
+  if (WatchOS.WATCHDOG_isInterruptFlag()){
     // generate a beautiful random value. just 0 to 5
-      int val = WatchOS.REGISTER_read(1); // read from the register
-      int val_old = val;
-      while (abs(val-val_old) <= 1) val+=analogRead(PADC_TEMP); val = val%6; // just make sure it's not the same number and not close to previous number
-      WatchOS.REGISTER_write(1, val); // save for later wake up cycle
-      
-      // display the LED
-      WatchOS.LED_write((val+0)%12, LED_ON);
-      WatchOS.LED_write((val+6)%12, LED_ON);
-      delay(50);
+    // int val = WatchOS.REGISTER_read(1, WatchOS.SOURCE); // read from the register
+    // int val_old = val;
+    // while (abs(val-val_old) <= 1) val+=analogRead(PADC_TEMP); val = val%6; // just make sure it's not the same number and not close to previous number
+    // WatchOS.REGISTER_write(1, val); // save for later wake up cycle
+    
+    // // display the LED
+    // WatchOS.LED_setPowerLimit(WatchOS.POWER_MAXIMUM);
+    // WatchOS.LED_write((val+0)%12, LED_ON);
+    // WatchOS.LED_write((val+6)%12, LED_ON);
+    // delay(50);
 
-      WatchOS.POWER_shutdown();
+      
+    WatchOS.RTC_update();
+    int clock_minute = WatchOS.RTC_getMinute();
+    int result_minute = clock_minute / 5;
+    // replace zero with 12
+    if(result_minute == 0) result_minute = 12;
+    WatchOS.LED_setPowerLimit(WatchOS.POWER_MAXIMUM);
+    WatchOS.LED_write(NUMBER_F(result_minute), LED_ON);
+    delay(50);
+
+    WatchOS.shutdown();
   }
   // ------------------------------------------------------------
   // START THE FSM
@@ -86,8 +104,8 @@ void loop() {
     // make sure the button released
     do{delay(200);} while(WatchOS.BUTTON_isPressed());
 
-    WATCH_display_time();
-    
+    WATCH_display_mode(DISPLAY_MODE);
+
     if(WatchOS.BUTTON_isPressed()){
       LED_all_delay(LED_ON, 100);
       LED_all_delay(LED_OFF, 100);
@@ -105,10 +123,10 @@ void loop() {
     CONFIG_TIME();
   }
   if(FSM_STATE == 12){
-    DEBUG_TIME();
+    DEBUG_FIME();
   }
   if(FSM_STATE == 13){
-    WatchOS.BOOTLOADER_run();
+    WatchOS.bootloader();
   }
   if(FSM_STATE == 14){
     for(int i=0; i<5; i++){
@@ -126,7 +144,7 @@ void loop() {
       delay(100);
     }
   }
-  WatchOS.POWER_shutdown();
+  WatchOS.shutdown();
 }
 
 // ------------------------------------------------------------------
@@ -141,7 +159,7 @@ bool FSM_timeout(unsigned long ms){
   // unused guard, check device is alive
   if(millis() - FSM_ALIVE_millis > ms){
     FSM_STATE = 0;
-    DEBUG_T Serial.println("[DEBUG] CONFIG TIMEOUT");
+    DEBUG_F Serial.println("[DEBUG] CONFIG TIMEOUT");
     return true;
   }
   return false;
@@ -167,7 +185,7 @@ void LED_all_delay(bool led_state, unsigned long delay_ms){
 #pragma region CONFIG_MENU
 // ------------------------------------------------------------------
 void CONFIG_MENU(){
-    DEBUG_T Serial.println("[DEBUG] CONFIG MENU");
+    DEBUG_F Serial.println("[DEBUG] CONFIG MENU");
     CONFIG_value = 1;
     CONFIG_MENU_index = 1;
     // make sure the button released
@@ -194,15 +212,15 @@ void CONFIG_MENU(){
             CONFIG_value = CONFIG_value % (4+1); // 0-5 only
             CONFIG_value++; // 1-6
 
-            DEBUG_T Serial.print("[DEBUG] CONFIG_value: ");
-            DEBUG_T Serial.println(CONFIG_value);
+            DEBUG_F Serial.print("[DEBUG] CONFIG_value: ");
+            DEBUG_F Serial.println(CONFIG_value);
 
             WatchOS.LED_write(NUMBER_F(CONFIG_value), LED_ON);
           }else if(_result == 2){
             CONFIG_MENU_index = CONFIG_value;
 
-            DEBUG_T Serial.print("[DEBUG] CONFIG_MENU: ");
-            DEBUG_T Serial.println(CONFIG_MENU_index);
+            DEBUG_F Serial.print("[DEBUG] CONFIG_MENU: ");
+            DEBUG_F Serial.println(CONFIG_MENU_index);
             
             CONFIG_state = 1;
 
@@ -250,7 +268,7 @@ void CONFIG_TIME(){
     // ------------------------------------------------------------
     // CONFIG HOUR
     // ------------------------------------------------------------
-    DEBUG_T Serial.println("[DEBUG] CONFIG HOUR HAND");
+    DEBUG_F Serial.println("[DEBUG] CONFIG HOUR HAND");
     CONFIG_value = hourvalue;
     CONFIG_CLOCK_hour = hourvalue;
 
@@ -284,10 +302,10 @@ void CONFIG_TIME(){
           WatchOS.LED_clear();
           WatchOS.LED_write(NUMBER_F(CONFIG_value), LED_ON);
 
-          DEBUG_T Serial.print("[DEBUG] CONFIG_value: ");
-          DEBUG_T Serial.println(CONFIG_value);
-          DEBUG_T Serial.print("[DEBUG] CONFIG_CLOCK_hour: ");
-          DEBUG_T Serial.println(CONFIG_CLOCK_hour);
+          DEBUG_F Serial.print("[DEBUG] CONFIG_value: ");
+          DEBUG_F Serial.println(CONFIG_value);
+          DEBUG_F Serial.print("[DEBUG] CONFIG_CLOCK_hour: ");
+          DEBUG_F Serial.println(CONFIG_CLOCK_hour);
         }
       }
       if(CONFIG_state == 1){
@@ -312,7 +330,7 @@ void CONFIG_TIME(){
     // ------------------------------------------------------------
     // CONFIG MINUTE HAND
     // ------------------------------------------------------------
-    DEBUG_T Serial.println("[DEBUG] CONFIG MINUTE HAND");
+    DEBUG_F Serial.println("[DEBUG] CONFIG MINUTE HAND");
     CONFIG_value = minutevalue;
     CONFIG_CLOCK_minute = minutevalue;
 
@@ -347,10 +365,10 @@ void CONFIG_TIME(){
           WatchOS.LED_write(NUMBER_F(CONFIG_CLOCK_hour), LED_ON);
           WatchOS.LED_write(NUMBER_F(CONFIG_value), LED_ON);
 
-          DEBUG_T Serial.print("[DEBUG] CONFIG_value: ");
-          DEBUG_T Serial.println(CONFIG_value);
-          DEBUG_T Serial.print("[DEBUG] CONFIG_CLOCK_minute: ");
-          DEBUG_T Serial.println(CONFIG_CLOCK_minute);
+          DEBUG_F Serial.print("[DEBUG] CONFIG_value: ");
+          DEBUG_F Serial.println(CONFIG_value);
+          DEBUG_F Serial.print("[DEBUG] CONFIG_CLOCK_minute: ");
+          DEBUG_F Serial.println(CONFIG_CLOCK_minute);
         }
       }
       if(CONFIG_state == 1){
@@ -376,7 +394,7 @@ void CONFIG_TIME(){
     // ------------------------------------------------------------
     // CONFIG PLUS MINUTE HAND
     // ------------------------------------------------------------
-    DEBUG_T Serial.println("[DEBUG] CONFIG MINUTE ACCURACY");
+    DEBUG_F Serial.println("[DEBUG] CONFIG MINUTE ACCURACY");
     CONFIG_value = 0;
     CONFIG_CLOCK_plusminute = 0;
 
@@ -420,10 +438,10 @@ void CONFIG_TIME(){
           if (CONFIG_value>0)
             WatchOS.LED_write(NUMBER_F((CONFIG_CLOCK_minute+CONFIG_value) % (12+1)), LED_ON);
 
-          DEBUG_T Serial.print("[DEBUG] CONFIG_value: ");
-          DEBUG_T Serial.println(CONFIG_value);
-          DEBUG_T Serial.print("[DEBUG] CONFIG_CLOCK_plusminute: ");
-          DEBUG_T Serial.println(CONFIG_CLOCK_plusminute);
+          DEBUG_F Serial.print("[DEBUG] CONFIG_value: ");
+          DEBUG_F Serial.println(CONFIG_value);
+          DEBUG_F Serial.print("[DEBUG] CONFIG_CLOCK_plusminute: ");
+          DEBUG_F Serial.println(CONFIG_CLOCK_plusminute);
         }
       }
       if(CONFIG_state == 1){
@@ -449,9 +467,10 @@ void CONFIG_TIME(){
     // ------------------------------------------------------------
     // CONFIG SECOND HAND
     // ------------------------------------------------------------
-    DEBUG_T Serial.println("[DEBUG] CONFIG SECOND HAND");
-    CONFIG_value = 6;
     CONFIG_CLOCK_second = 6;
+#ifdef USE_SECOND
+    CONFIG_value = 6;
+    DEBUG_F Serial.println("[DEBUG] CONFIG SECOND HAND");
 
     // make sure the button released
     do{delay(200);} while(WatchOS.BUTTON_isPressed());
@@ -481,10 +500,10 @@ void CONFIG_TIME(){
           WatchOS.LED_clear();
           WatchOS.LED_write(NUMBER_F(CONFIG_value), LED_ON);
 
-          DEBUG_T Serial.print("[DEBUG] CONFIG_value: ");
-          DEBUG_T Serial.println(CONFIG_value);
-          DEBUG_T Serial.print("[DEBUG] CONFIG_CLOCK_second: ");
-          DEBUG_T Serial.println(CONFIG_CLOCK_second);
+          DEBUG_F Serial.print("[DEBUG] CONFIG_value: ");
+          DEBUG_F Serial.println(CONFIG_value);
+          DEBUG_F Serial.print("[DEBUG] CONFIG_CLOCK_second: ");
+          DEBUG_F Serial.println(CONFIG_CLOCK_second);
         }
       }
       if(CONFIG_state == 1){
@@ -512,6 +531,7 @@ void CONFIG_TIME(){
       // unused guard, check device is alive
       if(FSM_timeout(FSM_ALIVE_MS)) break;
     }
+#endif
 #pragma endregion CONFIG_SECOND
 
     // ------------------------------------------------------------
@@ -519,26 +539,26 @@ void CONFIG_TIME(){
     // ------------------------------------------------------------
 #pragma region CONFIG_SAVE
     while (1) {
-      DEBUG_T Serial.print("[DEBUG] CONFIG_CLOCK_hour: ");
-      DEBUG_T Serial.println(CONFIG_CLOCK_hour);
-      DEBUG_T Serial.print("[DEBUG] CONFIG_CLOCK_minute: ");
-      DEBUG_T Serial.println(CONFIG_CLOCK_minute);
-      DEBUG_T Serial.print("[DEBUG] CONFIG_CLOCK_plusminute: ");
-      DEBUG_T Serial.println(CONFIG_CLOCK_plusminute);
-      DEBUG_T Serial.print("[DEBUG] CONFIG_CLOCK_second: ");
-      DEBUG_T Serial.println(CONFIG_CLOCK_second);
+      DEBUG_F Serial.print("[DEBUG] CONFIG_CLOCK_hour: ");
+      DEBUG_F Serial.println(CONFIG_CLOCK_hour);
+      DEBUG_F Serial.print("[DEBUG] CONFIG_CLOCK_minute: ");
+      DEBUG_F Serial.println(CONFIG_CLOCK_minute);
+      DEBUG_F Serial.print("[DEBUG] CONFIG_CLOCK_plusminute: ");
+      DEBUG_F Serial.println(CONFIG_CLOCK_plusminute);
+      DEBUG_F Serial.print("[DEBUG] CONFIG_CLOCK_second: ");
+      DEBUG_F Serial.println(CONFIG_CLOCK_second);
 
       int result_hour = CONFIG_CLOCK_hour;
       int result_minutes = CONFIG_CLOCK_minute*5 + CONFIG_CLOCK_plusminute;
       int result_seconds = CONFIG_CLOCK_second*5 + 1; // +1 button press delay
       
-      DEBUG_T Serial.print("[DEBUG] RESULT: ");
-      DEBUG_T Serial.print(result_hour);
-      DEBUG_T Serial.print(":");
-      DEBUG_T Serial.print(result_minutes);
-      DEBUG_T Serial.print(":");
-      DEBUG_T Serial.print(result_seconds);
-      DEBUG_T Serial.println();
+      DEBUG_F Serial.print("[DEBUG] RESULT: ");
+      DEBUG_F Serial.print(result_hour);
+      DEBUG_F Serial.print(":");
+      DEBUG_F Serial.print(result_minutes);
+      DEBUG_F Serial.print(":");
+      DEBUG_F Serial.print(result_seconds);
+      DEBUG_F Serial.println();
 
       WatchOS.RTC_setTime(result_hour, result_minutes, result_seconds);
       
@@ -557,23 +577,23 @@ void CONFIG_TIME(){
 // ------------------------------------------------------------------
 
 // ------------------------------------------------------------------
-#pragma region DEBUG_TIME
+#pragma region DEBUG_FIME
 // ------------------------------------------------------------------
-void DEBUG_TIME(){
+void DEBUG_FIME(){
     int DEBUG_RTC_led_active = 0;
-    unsigned long DEBUG_TIME_millis = 0;
-    unsigned long DEBUG_TIME_led_millis = 0;
+    unsigned long DEBUG_FIME_millis = 0;
+    unsigned long DEBUG_FIME_led_millis = 0;
 
     int DEBUG_led_index = 22;
     unsigned long DEBUG_millis = 0;
     while(1){
-      if(millis() - DEBUG_TIME_millis > 1000){
+      if(millis() - DEBUG_FIME_millis > 1000){
         WatchOS.LED_write(NUMBER_F(3), LED_ON);
         WatchOS.LED_write(NUMBER_F(8), LED_ON);
         WatchOS.LED_write(NUMBER_F(9), LED_ON);
         WatchOS.LED_write(NUMBER_F(12), LED_ON);
         DEBUG_RTC_led_active = 1;
-        DEBUG_TIME_led_millis = millis();
+        DEBUG_FIME_led_millis = millis();
 
         int hourvalue = WatchOS.RTC_getHour();
         int minutevalue = WatchOS.RTC_getMinute();
@@ -588,10 +608,10 @@ void DEBUG_TIME(){
         if (minutevalue<10) Serial.print('0');
         Serial.print(secondvalue);
         Serial.println();
-        DEBUG_TIME_millis = millis();
+        DEBUG_FIME_millis = millis();
       }
 
-      if(DEBUG_RTC_led_active && (millis() - DEBUG_TIME_led_millis > 100)){
+      if(DEBUG_RTC_led_active && (millis() - DEBUG_FIME_led_millis > 100)){
         DEBUG_RTC_led_active = 0;
         WatchOS.LED_write(NUMBER_F(3), LED_OFF);
         WatchOS.LED_write(NUMBER_F(8), LED_OFF);
@@ -601,7 +621,7 @@ void DEBUG_TIME(){
 
       if((millis() - DEBUG_millis > 75)){
         if(DEBUG_led_index >= 24) DEBUG_led_index = 0;
-        WatchOS.LED_write(PIXEL_COLOR_HOUR, DEBUG_led_index++/2, !(DEBUG_led_index%2));
+        WatchOS.LED_write(DEBUG_led_index++/2, !(DEBUG_led_index%2));
         DEBUG_millis = millis();
       }
 
@@ -609,13 +629,13 @@ void DEBUG_TIME(){
 
     }
 }
-#pragma endregion DEBUG_TIME
+#pragma endregion DEBUG_FIME
 // ------------------------------------------------------------------
 
 // ------------------------------------------------------------------
 #pragma region DISPLAY_TIME
 // ------------------------------------------------------------------
-void WATCH_display_time(){
+void WATCH_display_mode(int mode){
   WatchOS.RTC_update();
   int clock_hour = WatchOS.RTC_getHour();
   int clock_minute = WatchOS.RTC_getMinute();
@@ -624,70 +644,168 @@ void WATCH_display_time(){
   // int clock_minute = random(0, 59);
   // int clock_second = random(0, 59);
 
-  DEBUG_T Serial.print("[DEBUG] DISPLAYING RAW: ");
-  DEBUG_T Serial.print(clock_hour);
-  DEBUG_T Serial.print(":");
-  DEBUG_T Serial.print(clock_minute);
-  DEBUG_T Serial.print(":");
-  DEBUG_T Serial.print(clock_second);
-  DEBUG_T Serial.println();
+  int clock_hour_tens = (clock_hour/10)%10; 
+  int clock_hour_unit = clock_hour%10;
+  int clock_minute_tens = (clock_minute/10)%10; 
+  int clock_minute_unit = clock_minute%10;
+  int clock_second_tens = (clock_second/10)%10; 
+  int clock_second_unit = clock_second%10;
 
-  // adjust based on watch
-  if(clock_hour > 12) clock_hour -= 12;
-  int result_hour = clock_hour;
 
-  int result_minute = clock_minute / 5;
-  int result_minute_remainder = clock_minute % 5;
+  DEBUG_F Serial.print("[DEBUG] DISPLAYING RAW: ");
+  DEBUG_F Serial.print(clock_hour);
+  DEBUG_F Serial.print(":");
+  DEBUG_F Serial.print(clock_minute);
+  DEBUG_F Serial.print(":");
+  DEBUG_F Serial.print(clock_second);
+  DEBUG_F Serial.println();
 
-  // show hour hand
-  WatchOS.LED_write(NUMBER_F(result_hour), LED_ON);
-  delay(500);
+  DEBUG_F Serial.print("[DEBUG] DISPLAYING DECIMAL: ");
+  DEBUG_F Serial.print(clock_hour_tens);
+  DEBUG_F Serial.print("-");
+  DEBUG_F Serial.print(clock_hour_unit);
+  DEBUG_F Serial.print(":");
+  DEBUG_F Serial.print(clock_minute_tens);
+  DEBUG_F Serial.print("-");
+  DEBUG_F Serial.print(clock_minute_unit);
+  DEBUG_F Serial.print(":");
+  DEBUG_F Serial.print(clock_second_tens);
+  DEBUG_F Serial.print("-");
+  DEBUG_F Serial.print(clock_second_unit);
+  DEBUG_F Serial.println();
 
-  // show minute hand
-  if(result_minute == result_hour){ // if minute sama as hour just turn off a little to see the transition
-    WatchOS.LED_write(NUMBER_F(result_minute), LED_OFF);
-    delay(200);
+  // replace 0 with 12 before displaying
+  if(clock_hour_tens == 0) clock_hour_tens = 12; 
+  if(clock_hour_unit == 0) clock_hour_unit = 12; 
+  if(clock_minute_tens == 0) clock_minute_tens = 12; 
+  if(clock_minute_unit == 0) clock_minute_unit = 12; 
+  if(clock_second_tens == 0) clock_second_tens = 12; 
+  if(clock_second_unit == 0) clock_second_unit = 12; 
+
+  if(mode == 0){
+    // adjust based on watch
+    if(clock_hour > 12) clock_hour -= 12;
+    int result_hour = clock_hour;
+
+    int result_minute = clock_minute / 5;
+    int result_minute_remainder = clock_minute % 5;
+
+    // show hour hand
+    WatchOS.LED_write(NUMBER_F(result_hour), LED_ON);
+    delay(500);
+
+    // show minute hand
+    if(result_minute == result_hour){ // if minute sama as hour just turn off a little to see the transition
+      WatchOS.LED_write(NUMBER_F(result_minute), LED_OFF);
+      delay(200);
+    }
+    WatchOS.LED_write(NUMBER_F(result_minute), LED_ON);
+    delay(2000);
+    WatchOS.LED_clear();
+
+    // show plus hand
+    for (int i = 0; i < result_minute_remainder; i++){
+      int _plusminute = result_minute+i+1;
+      if(_plusminute > 12) _plusminute -= 12;
+      
+      WatchOS.LED_write(NUMBER_F(result_minute), LED_ON);
+      WatchOS.LED_write(NUMBER_F(_plusminute), LED_ON);
+      delay(250);
+      WatchOS.LED_write(NUMBER_F(result_minute), LED_ON);
+      WatchOS.LED_write(NUMBER_F(_plusminute), LED_OFF);
+      delay(250);
+    }
+    WatchOS.LED_clear();
+    delay(1000);
+
+    // show second
+    int result_second = ((clock_second/10) * 2) + 2; // +2 means the maximum tolerenace of the clock 
+#ifdef USE_SECOND
+    if(result_second > 0){
+      WatchOS.LED_write(NUMBER_F(result_second), LED_ON);
+    }else{
+      WatchOS.LED_write(NUMBER_F(12), LED_ON);
+    }
+    delay(2000);
+#endif
+
+    WatchOS.LED_clear();
+
+    DEBUG_F Serial.print("[DEBUG] DISPLAYING LED: ");
+    DEBUG_F Serial.print(result_hour);
+    DEBUG_F Serial.print(":");
+    DEBUG_F Serial.print(result_minute);
+    DEBUG_F Serial.print("+");
+    DEBUG_F Serial.print(result_minute_remainder);
+    DEBUG_F Serial.print(":");
+    DEBUG_F Serial.print(result_second);
+    DEBUG_F Serial.println();
   }
-  WatchOS.LED_write(NUMBER_F(result_minute), LED_ON);
-  delay(2000);
-  WatchOS.LED_clear();
+  if(mode == 1){
+    WatchOS.LED_write(NUMBER_F(clock_hour_tens), LED_ON);
+    delay(500);
+    WatchOS.LED_write(NUMBER_F(clock_hour_tens), LED_OFF);
+    delay(500);
+    WatchOS.LED_write(NUMBER_F(clock_hour_unit), LED_ON);
+    delay(500);
+    WatchOS.LED_write(NUMBER_F(clock_hour_unit), LED_OFF);
+    delay(500);
 
-  // show plus hand
-  for (int i = 0; i < result_minute_remainder; i++){
-    int _plusminute = result_minute+i+1;
-    if(_plusminute > 12) _plusminute -= 12;
+    WatchOS.LED_write(NUMBER_F(clock_minute_tens), LED_ON);
+    delay(500);
+    WatchOS.LED_write(NUMBER_F(clock_minute_tens), LED_OFF);
+    delay(500);
+    WatchOS.LED_write(NUMBER_F(clock_minute_unit), LED_ON);
+    delay(500);
+    WatchOS.LED_write(NUMBER_F(clock_minute_unit), LED_OFF);
+    delay(500);
+
+#ifdef USE_SECOND
+    WatchOS.LED_write(NUMBER_F(clock_second_tens), LED_ON);
+    delay(500);
+    WatchOS.LED_write(NUMBER_F(clock_second_tens), LED_OFF);
+    delay(500);
+    WatchOS.LED_write(NUMBER_F(clock_second_unit), LED_ON);
+    delay(500);
+    WatchOS.LED_write(NUMBER_F(clock_second_unit), LED_OFF);
+    delay(500);
+#endif
+  }
+  if(mode == 2){
+    WatchOS.LED_write(NUMBER_F(clock_hour_tens), LED_ON);
+    for (int i = 0; i < 10; i++){
+      WatchOS.LED_write(NUMBER_F(clock_hour_unit), LED_ON);
+      delay(50);
+      WatchOS.LED_write(NUMBER_F(clock_hour_unit), LED_OFF);
+      delay(50);
+    }
+    WatchOS.LED_write(NUMBER_F(clock_hour_tens), LED_OFF);
+    // delay(500);
     
-    WatchOS.LED_write(NUMBER_F(result_minute), LED_ON);
-    WatchOS.LED_write(NUMBER_F(_plusminute), LED_ON);
-    delay(250);
-    WatchOS.LED_write(NUMBER_F(result_minute), LED_ON);
-    WatchOS.LED_write(NUMBER_F(_plusminute), LED_OFF);
-    delay(250);
-  }
-  WatchOS.LED_clear();
-  delay(1000);
 
-  // show second
-  int result_second = ((clock_second/10) * 2) + 2; // +2 means the maximum tolerenace of the clock 
-  if(result_second > 0){
-    WatchOS.LED_write(NUMBER_F(result_second), LED_ON);
-  }else{
-    WatchOS.LED_write(NUMBER_F(12), LED_ON);
-  }
-  delay(2000);
-  WatchOS.LED_clear();
+    WatchOS.LED_write(NUMBER_F(clock_minute_tens), LED_ON);
+    for (int i = 0; i < 10; i++){
+      WatchOS.LED_write(NUMBER_F(clock_minute_unit), LED_ON);
+      delay(50);
+      WatchOS.LED_write(NUMBER_F(clock_minute_unit), LED_OFF);
+      delay(50);
+    }
+    WatchOS.LED_write(NUMBER_F(clock_minute_tens), LED_OFF);
+    // delay(500);
 
-  DEBUG_T Serial.print("[DEBUG] DISPLAYING LED: ");
-  DEBUG_T Serial.print(result_hour);
-  DEBUG_T Serial.print(":");
-  DEBUG_T Serial.print(result_minute);
-  DEBUG_T Serial.print("+");
-  DEBUG_T Serial.print(result_minute_remainder);
-  DEBUG_T Serial.print(":");
-  DEBUG_T Serial.print(result_second);
-  DEBUG_T Serial.println();
+#ifdef USE_SECOND
+    WatchOS.LED_write(NUMBER_F(clock_second_tens), LED_ON);
+    for (int i = 0; i < 10; i++){
+      WatchOS.LED_write(NUMBER_F(clock_second_unit), LED_ON);
+      delay(50);
+      WatchOS.LED_write(NUMBER_F(clock_second_unit), LED_OFF);
+      delay(50);
+    }
+    WatchOS.LED_write(NUMBER_F(clock_second_tens), LED_OFF);
+    // delay(500);
+#endif
+  }
 }
-
 #pragma endregion DISPLAY_TIME
 // ------------------------------------------------------------------
 /* END USER APP CODE 1*/
