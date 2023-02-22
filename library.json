@@ -1,13 +1,13 @@
 {
-  "name": "TQDF_WatchOS_STM32",
+  "name": "TQDF_WatchOS",
   "keywords": "Device Control",
-  "description": "Arduino library to support low power save primitives features of STM32 based boards.",
+  "description": "Arduino library to support all features of TQDF Watch.",
   "repository":
   {
     "type": "git",
-    "url": "https://github.com/stm32duino/STM32LowPower"
+    "url": "https://github.com/triqadafi/TQDF_WatchOS"
   },
-  "version": "1.2.2",
+  "version": "1.2.3",
   "frameworks": "arduino",
   "platforms": "ststm32",
   "build": {
