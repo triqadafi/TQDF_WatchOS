@@ -108,6 +108,7 @@ class TQDF_WatchOS
      * @param pins Clock pins. Pointer to an array with 12 byte width
      * @param power_pin MOSFET gate pin to power up the LED. (PWM Capable)
      * @param button_pin
+     * @param beeper_pin
      * @param pins_unused Threated differently. Pointer to an array with 20 byte width.
      * Make sure they are no floating. All unused pins should be listed on pins_unused. Floating pins means more power consumtion.
      * @note This function should be called directly right after the setup(). 
@@ -122,6 +123,7 @@ class TQDF_WatchOS
       int *pins, 
       int power_pin, 
       int button_pin, 
+      int beeper_pin, 
       int *pins_unused
     );
     
@@ -182,6 +184,7 @@ class TQDF_WatchOS
      */
     BUTTON_state BUTTON_getResult();
 
+    void BEEPER_play(unsigned int frequency, unsigned long duration);
 
     /**
      * @brief Function to lock the loop. Better for debugging application
@@ -430,9 +433,9 @@ class TQDF_WatchOS
      */
     bool WATCHDOG_isInterruptFlag();
 
+    void WATCHDOG_interrupt_handler();
+
     void WATCHDOG_clearInterruptFlag();
-    void WATCHDOG_setRoutine(WATCHDOG_routine watchdog_routine);
-    void WATCHDOG_disableInterrupt();
 
     unsigned long getUID(int index);
   private:
@@ -442,6 +445,7 @@ class TQDF_WatchOS
     int *pLED_pins_unused;
     int LED_power_pin;
     int BUTTON_pin;
+    int BEEPER_pin;
     int RTC_calibration_value;
 
     void GPIO_begin();
@@ -483,10 +487,9 @@ class TQDF_WatchOS
     void RTC_begin();
 
     void POWER_begin();
-    bool POWER_isInitialRun = false;
 
+    bool WATCHDOG_isInitialRun = false;
     int WATCHDOG_latolato_counter = 0;
-    bool WATCHDOG_setRoutine_called = false;
     bool WATCHDOG_wake_isRunning = false;
     WATCHDOG_routine WATCHDOG_interval;
     int WATCHDOG_encrypted_a = 0;
@@ -495,7 +498,9 @@ class TQDF_WatchOS
     static volatile bool WATCHDOG_elapsed_interrupt_flag;
     bool WATCHDOG_interrupt_first = false;
     void WATCHDOG_begin();
-    static void ISR_WATCHDOG_handler (void *data);
+    void WATCHDOG_interrupt_next();
+    void WATCHDOG_disableInterrupt();
+    // static void ISR_WATCHDOG_handler (void *data);
 };
 
 extern TQDF_WatchOS WatchOS;
