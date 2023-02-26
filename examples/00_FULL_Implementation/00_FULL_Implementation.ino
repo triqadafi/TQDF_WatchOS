@@ -51,6 +51,7 @@ void setup() {
     /* Clock pin (1-12): */ led_clock_pins, 
     /* LED Power pin:    */ led_power_pin, 
     /* Button pin:       */ button_pin, 
+    /* Beeper pin:       */ beeper_pin, 
     /* Unused pins:      */ unused_pins
   );
   /* USER SETUP CODE 1*/
@@ -80,7 +81,6 @@ void loop() {
     // WatchOS.LED_write((val+6)%12, LED_ON);
     // delay(50);
 
-      
     WatchOS.RTC_update();
     int clock_minute = WatchOS.RTC_getMinute();
     int result_minute = clock_minute / 5;
@@ -88,8 +88,11 @@ void loop() {
     if(result_minute == 0) result_minute = 12;
     WatchOS.LED_setPowerLimit(WatchOS.POWER_MAXIMUM);
     WatchOS.LED_write(NUMBER_F(result_minute), LED_ON);
+    WatchOS.BEEPER_play(12500, 30);
     delay(50);
+    WatchOS.BEEPER_play(12500, 30);
 
+    WatchOS.WATCHDOG_clearInterruptFlag();
     WatchOS.shutdown();
   }
   // ------------------------------------------------------------
@@ -644,14 +647,6 @@ void WATCH_display_mode(int mode){
   // int clock_minute = random(0, 59);
   // int clock_second = random(0, 59);
 
-  int clock_hour_tens = (clock_hour/10)%10; 
-  int clock_hour_unit = clock_hour%10;
-  int clock_minute_tens = (clock_minute/10)%10; 
-  int clock_minute_unit = clock_minute%10;
-  int clock_second_tens = (clock_second/10)%10; 
-  int clock_second_unit = clock_second%10;
-
-
   DEBUG_F Serial.print("[DEBUG] DISPLAYING RAW: ");
   DEBUG_F Serial.print(clock_hour);
   DEBUG_F Serial.print(":");
@@ -660,35 +655,38 @@ void WATCH_display_mode(int mode){
   DEBUG_F Serial.print(clock_second);
   DEBUG_F Serial.println();
 
-  DEBUG_F Serial.print("[DEBUG] DISPLAYING DECIMAL: ");
-  DEBUG_F Serial.print(clock_hour_tens);
-  DEBUG_F Serial.print("-");
-  DEBUG_F Serial.print(clock_hour_unit);
-  DEBUG_F Serial.print(":");
-  DEBUG_F Serial.print(clock_minute_tens);
-  DEBUG_F Serial.print("-");
-  DEBUG_F Serial.print(clock_minute_unit);
-  DEBUG_F Serial.print(":");
-  DEBUG_F Serial.print(clock_second_tens);
-  DEBUG_F Serial.print("-");
-  DEBUG_F Serial.print(clock_second_unit);
-  DEBUG_F Serial.println();
-
-  // replace 0 with 12 before displaying
-  if(clock_hour_tens == 0) clock_hour_tens = 12; 
-  if(clock_hour_unit == 0) clock_hour_unit = 12; 
-  if(clock_minute_tens == 0) clock_minute_tens = 12; 
-  if(clock_minute_unit == 0) clock_minute_unit = 12; 
-  if(clock_second_tens == 0) clock_second_tens = 12; 
-  if(clock_second_unit == 0) clock_second_unit = 12; 
-
   if(mode == 0){
-    // adjust based on watch
-    if(clock_hour > 12) clock_hour -= 12;
-    int result_hour = clock_hour;
+    WATCH_display_mode_normal(clock_hour, clock_minute, clock_second);
+  }
+  // experimental
+  if(mode == 1){
+    WATCH_display_mode_decimal1(clock_hour, clock_minute, clock_second);
+  }
+  // experimental
+  if(mode == 2){
+    WATCH_display_mode_decimal2(clock_hour, clock_minute, clock_second);
+  }
+}
 
-    int result_minute = clock_minute / 5;
-    int result_minute_remainder = clock_minute % 5;
+void WATCH_display_mode_normal(int hour, int minute, int second){
+    // adjust based on watch
+    if(hour > 12) hour -= 12;
+    int result_hour = hour;
+
+    int result_minute = minute / 5;
+    int result_minute_remainder = minute % 5;
+
+    int result_second = ((second/10) * 2) + 2; // +2 means the maximum tolerenace of the clock 
+
+    DEBUG_F Serial.print("[DEBUG] DISPLAYING LED: ");
+    DEBUG_F Serial.print(result_hour);
+    DEBUG_F Serial.print(":");
+    DEBUG_F Serial.print(result_minute);
+    DEBUG_F Serial.print("+");
+    DEBUG_F Serial.print(result_minute_remainder);
+    DEBUG_F Serial.print(":");
+    DEBUG_F Serial.print(result_second);
+    DEBUG_F Serial.println();
 
     // show hour hand
     WatchOS.LED_write(NUMBER_F(result_hour), LED_ON);
@@ -719,7 +717,6 @@ void WATCH_display_mode(int mode){
     delay(1000);
 
     // show second
-    int result_second = ((clock_second/10) * 2) + 2; // +2 means the maximum tolerenace of the clock 
 #ifdef USE_SECOND
     if(result_second > 0){
       WatchOS.LED_write(NUMBER_F(result_second), LED_ON);
@@ -728,84 +725,133 @@ void WATCH_display_mode(int mode){
     }
     delay(2000);
 #endif
-
     WatchOS.LED_clear();
-
-    DEBUG_F Serial.print("[DEBUG] DISPLAYING LED: ");
-    DEBUG_F Serial.print(result_hour);
-    DEBUG_F Serial.print(":");
-    DEBUG_F Serial.print(result_minute);
-    DEBUG_F Serial.print("+");
-    DEBUG_F Serial.print(result_minute_remainder);
-    DEBUG_F Serial.print(":");
-    DEBUG_F Serial.print(result_second);
-    DEBUG_F Serial.println();
-  }
-  if(mode == 1){
-    WatchOS.LED_write(NUMBER_F(clock_hour_tens), LED_ON);
-    delay(500);
-    WatchOS.LED_write(NUMBER_F(clock_hour_tens), LED_OFF);
-    delay(500);
-    WatchOS.LED_write(NUMBER_F(clock_hour_unit), LED_ON);
-    delay(500);
-    WatchOS.LED_write(NUMBER_F(clock_hour_unit), LED_OFF);
-    delay(500);
-
-    WatchOS.LED_write(NUMBER_F(clock_minute_tens), LED_ON);
-    delay(500);
-    WatchOS.LED_write(NUMBER_F(clock_minute_tens), LED_OFF);
-    delay(500);
-    WatchOS.LED_write(NUMBER_F(clock_minute_unit), LED_ON);
-    delay(500);
-    WatchOS.LED_write(NUMBER_F(clock_minute_unit), LED_OFF);
-    delay(500);
-
-#ifdef USE_SECOND
-    WatchOS.LED_write(NUMBER_F(clock_second_tens), LED_ON);
-    delay(500);
-    WatchOS.LED_write(NUMBER_F(clock_second_tens), LED_OFF);
-    delay(500);
-    WatchOS.LED_write(NUMBER_F(clock_second_unit), LED_ON);
-    delay(500);
-    WatchOS.LED_write(NUMBER_F(clock_second_unit), LED_OFF);
-    delay(500);
-#endif
-  }
-  if(mode == 2){
-    WatchOS.LED_write(NUMBER_F(clock_hour_tens), LED_ON);
-    for (int i = 0; i < 10; i++){
-      WatchOS.LED_write(NUMBER_F(clock_hour_unit), LED_ON);
-      delay(50);
-      WatchOS.LED_write(NUMBER_F(clock_hour_unit), LED_OFF);
-      delay(50);
-    }
-    WatchOS.LED_write(NUMBER_F(clock_hour_tens), LED_OFF);
-    // delay(500);
-    
-
-    WatchOS.LED_write(NUMBER_F(clock_minute_tens), LED_ON);
-    for (int i = 0; i < 10; i++){
-      WatchOS.LED_write(NUMBER_F(clock_minute_unit), LED_ON);
-      delay(50);
-      WatchOS.LED_write(NUMBER_F(clock_minute_unit), LED_OFF);
-      delay(50);
-    }
-    WatchOS.LED_write(NUMBER_F(clock_minute_tens), LED_OFF);
-    // delay(500);
-
-#ifdef USE_SECOND
-    WatchOS.LED_write(NUMBER_F(clock_second_tens), LED_ON);
-    for (int i = 0; i < 10; i++){
-      WatchOS.LED_write(NUMBER_F(clock_second_unit), LED_ON);
-      delay(50);
-      WatchOS.LED_write(NUMBER_F(clock_second_unit), LED_OFF);
-      delay(50);
-    }
-    WatchOS.LED_write(NUMBER_F(clock_second_tens), LED_OFF);
-    // delay(500);
-#endif
-  }
 }
+void WATCH_display_mode_decimal1(int hour, int minute, int second){
+  if(hour > 12) hour -= 12;
+  int clock_hour_tens = (hour/10)%10; 
+  int clock_hour_unit = hour%10;
+  int clock_minute_tens = (minute/10)%10; 
+  int clock_minute_unit = minute%10;
+  int clock_second_tens = (second/10)%10; 
+  int clock_second_unit = second%10;
+
+  DEBUG_F Serial.print("[DEBUG] DISPLAYING DECIMAL (12-hour format): ");
+  DEBUG_F Serial.print(clock_hour_tens);
+  DEBUG_F Serial.print("-");
+  DEBUG_F Serial.print(clock_hour_unit);
+  DEBUG_F Serial.print(":");
+  DEBUG_F Serial.print(clock_minute_tens);
+  DEBUG_F Serial.print("-");
+  DEBUG_F Serial.print(clock_minute_unit);
+  DEBUG_F Serial.print(":");
+  DEBUG_F Serial.print(clock_second_tens);
+  DEBUG_F Serial.print("-");
+  DEBUG_F Serial.print(clock_second_unit);
+  DEBUG_F Serial.println();
+
+  // replace 0 with 12 before displaying
+  if(clock_hour_tens == 0) clock_hour_tens = 12; 
+  if(clock_hour_unit == 0) clock_hour_unit = 12; 
+  if(clock_minute_tens == 0) clock_minute_tens = 12; 
+  if(clock_minute_unit == 0) clock_minute_unit = 12; 
+  if(clock_second_tens == 0) clock_second_tens = 12; 
+  if(clock_second_unit == 0) clock_second_unit = 12; 
+
+  WatchOS.LED_write(NUMBER_F(clock_hour_tens), LED_ON);
+  delay(500);
+  WatchOS.LED_write(NUMBER_F(clock_hour_tens), LED_OFF);
+  delay(500);
+  WatchOS.LED_write(NUMBER_F(clock_hour_unit), LED_ON);
+  delay(500);
+  WatchOS.LED_write(NUMBER_F(clock_hour_unit), LED_OFF);
+  delay(500);
+
+  WatchOS.LED_write(NUMBER_F(clock_minute_tens), LED_ON);
+  delay(500);
+  WatchOS.LED_write(NUMBER_F(clock_minute_tens), LED_OFF);
+  delay(500);
+  WatchOS.LED_write(NUMBER_F(clock_minute_unit), LED_ON);
+  delay(500);
+  WatchOS.LED_write(NUMBER_F(clock_minute_unit), LED_OFF);
+  delay(500);
+
+#ifdef USE_SECOND
+  WatchOS.LED_write(NUMBER_F(clock_second_tens), LED_ON);
+  delay(500);
+  WatchOS.LED_write(NUMBER_F(clock_second_tens), LED_OFF);
+  delay(500);
+  WatchOS.LED_write(NUMBER_F(clock_second_unit), LED_ON);
+  delay(500);
+  WatchOS.LED_write(NUMBER_F(clock_second_unit), LED_OFF);
+  delay(500);
+#endif
+}
+void WATCH_display_mode_decimal2(int hour, int minute, int second){
+  if(hour > 12) hour -= 12;
+  int clock_hour_tens = (hour/10)%10; 
+  int clock_hour_unit = hour%10;
+  int clock_minute_tens = (minute/10)%10; 
+  int clock_minute_unit = minute%10;
+  int clock_second_tens = (second/10)%10; 
+  int clock_second_unit = second%10;
+
+  DEBUG_F Serial.print("[DEBUG] DISPLAYING DECIMAL (12-hour format): ");
+  DEBUG_F Serial.print(clock_hour_tens);
+  DEBUG_F Serial.print("-");
+  DEBUG_F Serial.print(clock_hour_unit);
+  DEBUG_F Serial.print(":");
+  DEBUG_F Serial.print(clock_minute_tens);
+  DEBUG_F Serial.print("-");
+  DEBUG_F Serial.print(clock_minute_unit);
+  DEBUG_F Serial.print(":");
+  DEBUG_F Serial.print(clock_second_tens);
+  DEBUG_F Serial.print("-");
+  DEBUG_F Serial.print(clock_second_unit);
+  DEBUG_F Serial.println();
+
+  // replace 0 with 12 before displaying
+  if(clock_hour_tens == 0) clock_hour_tens = 12; 
+  if(clock_hour_unit == 0) clock_hour_unit = 12; 
+  if(clock_minute_tens == 0) clock_minute_tens = 12; 
+  if(clock_minute_unit == 0) clock_minute_unit = 12; 
+  if(clock_second_tens == 0) clock_second_tens = 12; 
+  if(clock_second_unit == 0) clock_second_unit = 12; 
+
+  WatchOS.LED_write(NUMBER_F(clock_hour_tens), LED_ON);
+  for (int i = 0; i < 10; i++){
+    WatchOS.LED_write(NUMBER_F(clock_hour_unit), LED_ON);
+    delay(50);
+    WatchOS.LED_write(NUMBER_F(clock_hour_unit), LED_OFF);
+    delay(50);
+  }
+  WatchOS.LED_write(NUMBER_F(clock_hour_tens), LED_OFF);
+  // delay(500);
+  
+
+  WatchOS.LED_write(NUMBER_F(clock_minute_tens), LED_ON);
+  for (int i = 0; i < 10; i++){
+    WatchOS.LED_write(NUMBER_F(clock_minute_unit), LED_ON);
+    delay(50);
+    WatchOS.LED_write(NUMBER_F(clock_minute_unit), LED_OFF);
+    delay(50);
+  }
+  WatchOS.LED_write(NUMBER_F(clock_minute_tens), LED_OFF);
+  // delay(500);
+
+#ifdef USE_SECOND
+  WatchOS.LED_write(NUMBER_F(clock_second_tens), LED_ON);
+  for (int i = 0; i < 10; i++){
+    WatchOS.LED_write(NUMBER_F(clock_second_unit), LED_ON);
+    delay(50);
+    WatchOS.LED_write(NUMBER_F(clock_second_unit), LED_OFF);
+    delay(50);
+  }
+  WatchOS.LED_write(NUMBER_F(clock_second_tens), LED_OFF);
+  // delay(500);
+#endif
+}
+
 #pragma endregion DISPLAY_TIME
 // ------------------------------------------------------------------
 /* END USER APP CODE 1*/

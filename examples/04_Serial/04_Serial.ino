@@ -35,6 +35,7 @@ void setup() {
     /* Clock pin (1-12): */ led_clock_pins, 
     /* LED Power pin:    */ led_power_pin, 
     /* Button pin:       */ button_pin, 
+    /* Beeper pin:       */ beeper_pin, 
     /* Unused pins:      */ unused_pins
   );
   /* USER SETUP CODE 1*/
