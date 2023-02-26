@@ -45,7 +45,7 @@ void setup() {
   WatchOS.config(
     /* Serial Baudrate:  */ 115200, // 9600 or 115200
     /* RTC Preserved     */ true, 
-    /* RTC Callibration: */ 0x6EF, // From manufacturer (back of the PCB)
+    /* RTC Callibration: */ 0x0, // From manufacturer (back of the PCB) fill with 0x0 to disable calibration value
     /* WATCHDOG Routine  */ WatchOS.WAKE_EVERY_10S,
     /* GPIO -------------------------------------------------------------------*/ 
     /* Clock pin (1-12): */ led_clock_pins, 

@@ -44,7 +44,7 @@ void setup() {
   WatchOS.config(
     /* Serial Baudrate:  */ 115200, // 9600 or 115200
     /* RTC Preserved     */ true, 
-    /* RTC Callibration: */ 0x6EF, // From manufacturer (back of the PCB)
+    /* RTC Callibration: */ 0x0, // From manufacturer (back of the PCB) fill with 0x0 to disable calibration value
     /* WATCHDOG Routine  */ WatchOS.WAKE_EVERY_10S,
     /* GPIO -------------------------------------------------------------------*/ 
     /* Clock pin (1-12): */ led_clock_pins, 
@@ -56,7 +56,9 @@ void setup() {
   /* USER SETUP CODE 1*/
   // put your setup code here, to run once:
 
-
+// WatchOS.WATCHDOG_setWakeUpFlag(false);
+  WatchOS.WATCHDOG_reconfigureWakeUp(true);
+  WatchOS.BEEPER_play(12500, 50);
 
   /* END USER SETUP CODE 1*/
 }
@@ -69,6 +71,7 @@ void loop() {
     WatchOS.LED_write(NUMBER_F(3), LED_ON);
     WatchOS.LED_write(NUMBER_F(9), LED_ON);
     delay(50);
+    WatchOS.LED_clear();
     WatchOS.WATCHDOG_clearInterruptFlag();
     WatchOS.shutdown();
   }
@@ -134,7 +137,7 @@ void WATCH_display_time(){
     delay(250);
   }
   WatchOS.LED_clear();
-  delay(1000);
+  // delay(1000);
 
   // show second
   // int result_second = ((clock_second/10) * 2) + 2; // +2 means the maximum tolerenace of the clock 
@@ -145,8 +148,7 @@ void WATCH_display_time(){
   // }
   // delay(1000);
   // WatchOS.LED_clear();
-
-  delay(1000);
+  // delay(1000);
 
   DEBUG_F Serial.print("[DEBUG] DISPLAYING LED: ");
   DEBUG_F Serial.print(result_hour);
@@ -154,8 +156,9 @@ void WATCH_display_time(){
   DEBUG_F Serial.print(result_minute);
   DEBUG_F Serial.print("*5 + ");
   DEBUG_F Serial.print(result_minute_remainder);
-  DEBUG_F Serial.print("]:");
-  DEBUG_F Serial.print(result_second);
+  DEBUG_F Serial.print("]");
+  // DEBUG_F Serial.print(":");
+  // DEBUG_F Serial.print(result_second);
   DEBUG_F Serial.println();
 }
 

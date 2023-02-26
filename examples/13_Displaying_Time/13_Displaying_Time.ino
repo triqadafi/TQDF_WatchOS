@@ -28,7 +28,7 @@ void setup() {
   WatchOS.config(
     /* Serial Baudrate:  */ 115200, // 9600 or 115200
     /* RTC Preserved     */ true, 
-    /* RTC Callibration: */ 0x6EF, // From manufacturer (back of the PCB)
+    /* RTC Callibration: */ 0x0, // From manufacturer (back of the PCB) fill with 0x0 to disable calibration value
     /* WATCHDOG Routine  */ WatchOS.WAKE_DISABLED,
     /* GPIO -------------------------------------------------------------------*/ 
     /* Clock pin (1-12): */ led_clock_pins, 
@@ -129,8 +129,9 @@ void WATCH_display_time(){
   DEBUG_F Serial.print(result_minute);
   DEBUG_F Serial.print("*5 + ");
   DEBUG_F Serial.print(result_minute_remainder);
-  DEBUG_F Serial.print("]:");
-  DEBUG_F Serial.print(result_second);
+  DEBUG_F Serial.print("]");
+  // DEBUG_F Serial.print(":");
+  // DEBUG_F Serial.print(result_second);
   DEBUG_F Serial.println();
 }
 

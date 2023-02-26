@@ -30,7 +30,7 @@ void setup() {
   WatchOS.config(
     /* Serial Baudrate:  */ 115200, // 9600 or 115200
     /* RTC Preserved     */ true, 
-    /* RTC Callibration: */ 0x6EF, // From manufacturer (back of the PCB)
+    /* RTC Callibration: */ 0x0, // From manufacturer (back of the PCB) fill with 0x0 to disable calibration value
     /* WATCHDOG Routine  */ WatchOS.WAKE_DISABLED,
     /* GPIO -------------------------------------------------------------------*/ 
     /* Clock pin (1-12): */ led_clock_pins, 
@@ -54,7 +54,7 @@ void loop() {
   WatchOS.LED_write(NUMBER_F(12), LED_ON); // just tell the whatchdog that we are aware
 
   char tmp[16];
-  Serial.print("Device UID:");
+  Serial.print("Device UID: ");
   sprintf(tmp, "%.8X", WatchOS.getUID(0));
   Serial.print(tmp);
   Serial.print("-");
