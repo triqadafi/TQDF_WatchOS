@@ -13,8 +13,34 @@
 #ifndef TQDF_WatchOS_h
 #define TQDF_WatchOS_h
 
+// ------------------------------------------------------------------
+// TQDF_WatchOS HELPER
+// ------------------------------------------------------------------
 #define NUMBER_F(x) (x-1)
 
+// Debug Flag
+#ifndef DEBUG_F_ENABLE
+#define DEBUG_F_ENABLE false
+#endif
+#define DEBUG_F if(DEBUG_F_ENABLE) 
+
+// LED CONFIG
+// leave this, just edit CONFIG_LED_INVERT
+#define LED_ON WatchOS.LED_ON_logic
+#define LED_OFF WatchOS.LED_OFF_logic
+
+#define LED_POWER_ON WatchOS.LED_POWER_ON_logic
+#define LED_POWER_OFF WatchOS.LED_POWER_OFF_logic
+
+// BUTTON CONFIG
+#define BUTTON_PRESSED WatchOS.BUTTON_PRESSED_logic
+#define BUTTON_NORMAL WatchOS.BUTTON_NORMAL_logic
+// ------------------------------------------------------------------
+
+
+// ------------------------------------------------------------------
+// TQDF_WatchOS MAIN
+// ------------------------------------------------------------------
 #define USE_STM32
 #define USE_STM32F401CC
 
@@ -103,7 +129,7 @@ class TQDF_WatchOS
      * Real Time Clock (RTC) calbration value from the manufacturer.
      * Each device has a different calbration value. 
      * This calibration value written on the PCB or any information from the manufacturer.
-     * @param interval Represents the routine interval. When device is shutdown it will wake up the device base on the interval.
+     * @param watchdog_routine Represents the routine interval. When device is shutdown it will wake up the device base on the interval.
      * 
      * @param pins Clock pins. Pointer to an array with 12 byte width
      * @param power_pin MOSFET gate pin to power up the LED. (PWM Capable)
@@ -438,69 +464,6 @@ class TQDF_WatchOS
     void WATCHDOG_clearInterruptFlag();
 
     unsigned long getUID(int index);
-  private:
-    
-    // Config
-    int *pLED_pins;
-    int *pLED_pins_unused;
-    int LED_power_pin;
-    int BUTTON_pin;
-    int BEEPER_pin;
-    int RTC_calibration_value;
-
-    void GPIO_begin();
-    void GPIO_sleep();
-
-    // LED
-    int LED_pins_state[12] = {0};
-    LED_power LED_power_config = POWER_DYNAMIC;
-    int LED_brightness_max = 50;
-    
-    void LED_begin();
-    void LED_analog(int percent);
-    void LED_dynamic();
-    void LED_activate();
-    void LED_deactivate();
-    void LED_show();
-
-    // BUTTON_isSafePressed
-    bool BUTTON_state_last = false;
-    bool BUTTON_enable = true;
-    // BUTTON_getResult
-    int BUTTON_state = 0;
-    unsigned long BUTTON_millis = 0;
-    unsigned long BUTTON_press_millis = 0;
-    int BUTTON_result = 0;
-
-
-    uint32_t REGISTER_location[10] = {0};
-    void REGISTER_begin();
-
-    int RTC_register[6] = {0};
-    bool RTC_preserved = false;
-    // [0] Hour 
-    // [1] Minute
-    // [2] Second
-    // [3] Day 
-    // [4] Month 
-    // [5] Year
-    void RTC_begin();
-
-    void POWER_begin();
-
-    bool WATCHDOG_isInitialRun = false;
-    int WATCHDOG_latolato_counter = 0;
-    bool WATCHDOG_wake_isRunning = false;
-    WATCHDOG_routine WATCHDOG_interval;
-    int WATCHDOG_encrypted_a = 0;
-    int WATCHDOG_LED[12] = {0};
-    unsigned long WATCHDOG_millis;
-    static volatile bool WATCHDOG_elapsed_interrupt_flag;
-    bool WATCHDOG_interrupt_first = false;
-    void WATCHDOG_begin();
-    void WATCHDOG_interrupt_next();
-    void WATCHDOG_disableInterrupt();
-    // static void ISR_WATCHDOG_handler (void *data);
 };
 
 extern TQDF_WatchOS WatchOS;
