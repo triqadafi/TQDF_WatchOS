@@ -45,8 +45,8 @@ void setup() {
   WatchOS.config(
     /* Serial Baudrate:  */ 115200, // 9600 or 115200
     /* RTC Preserved     */ true, 
-    /* RTC Callibration: */ 0x0, // From manufacturer (back of the PCB) fill with 0x0 to disable calibration value
-    /* WATCHDOG Routine  */ WatchOS.WAKE_EVERY_10S,
+    /* RTC Callibration: */ 0x6EF, // From manufacturer (back of the PCB)
+    /* WATCHDOG Routine  */ WatchOS.WAKE_EVERY_1M,
     /* GPIO -------------------------------------------------------------------*/ 
     /* Clock pin (1-12): */ led_clock_pins, 
     /* LED Power pin:    */ led_power_pin, 
@@ -58,7 +58,7 @@ void setup() {
   WatchOS.WATCHDOG_reconfigureWakeUp(true);
   WatchOS.LED_setBrightnessMax(1);
 
-  WatchOS.RTC_initialTime(11,25,30);
+  WatchOS.RTC_initialTime(13,45,30);
 
   /* END USER SETUP CODE 1*/
 }
@@ -88,9 +88,12 @@ void loop() {
     if(result_minute == 0) result_minute = 12;
     WatchOS.LED_setPowerLimit(WatchOS.POWER_MAXIMUM);
     WatchOS.LED_write(NUMBER_F(result_minute), LED_ON);
-    WatchOS.BEEPER_play(12500, 30);
+    WatchOS.BEEPER_play(12500, 50);
     delay(50);
-    WatchOS.BEEPER_play(12500, 30);
+    WatchOS.LED_write(NUMBER_F(result_minute), LED_OFF);
+    delay(50);
+    WatchOS.BEEPER_play(12500, 50);
+    delay(50);
 
     WatchOS.WATCHDOG_clearInterruptFlag();
     WatchOS.shutdown();
