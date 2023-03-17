@@ -17,6 +17,7 @@
 // TQDF_WatchOS HELPER
 // ------------------------------------------------------------------
 #define NUMBER_F(x) (x-1)
+#define REPLACE_WITH_YOUR_CALIBRATION_VALUE 0
 
 // Debug Flag
 #ifndef DEBUG_F_ENABLE
@@ -115,7 +116,7 @@ class TQDF_WatchOS
     uint8_t BUTTON_NORMAL_logic = 0;
     uint8_t BUTTON_PRESSED_logic = 0;
 
-    uint8_t LED_dynamic_curve[13] = {0, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
+    uint8_t LED_dynamic_curve_default[12] = {10, 20, 35, 50, 100, 100, 100, 100, 100, 100, 100, 100};
 
     unsigned long BUTTON_DEBOUNCER_MS = CONFIG_BUTTON_DEBOUNCER_MS;
     unsigned long BUTTON_SHORTPRESS_MS = CONFIG_BUTTON_SHORTPRESS_MS;
@@ -130,13 +131,6 @@ class TQDF_WatchOS
      * Each device has a different calbration value. 
      * This calibration value written on the PCB or any information from the manufacturer.
      * @param watchdog_routine Represents the routine interval. When device is shutdown it will wake up the device base on the interval.
-     * 
-     * @param pins Clock pins. Pointer to an array with 12 byte width
-     * @param power_pin MOSFET gate pin to power up the LED. (PWM Capable)
-     * @param button_pin
-     * @param beeper_pin
-     * @param pins_unused Threated differently. Pointer to an array with 20 byte width.
-     * Make sure they are no floating. All unused pins should be listed on pins_unused. Floating pins means more power consumtion.
      * @note This function should be called directly right after the setup(). 
      * Make sure there are no initialization function that called before this function to guarantee the Operating System run smoothly
      */
@@ -280,6 +274,13 @@ class TQDF_WatchOS
      * @note Dynamic only hold until 4 LEDs
      */
     void LED_setBrightnessMax(int percent);
+
+    /**
+     * @brief Set led power distribution
+     * @param curvatures List of power ditribution in percent. Related to current consumption management on POWER_DYNAMIC in percent. LED_setPowerLimit() should be set in dynamic to use this config.
+     * @return None
+     */
+    void LED_setDynamicCurve(uint8_t *curvatures);
 
     /**
      * @brief Set Real Time Clock (RTC) initial time.
