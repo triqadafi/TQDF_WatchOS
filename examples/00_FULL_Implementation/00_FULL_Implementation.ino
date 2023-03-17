@@ -182,6 +182,46 @@ void LED_all_delay(bool led_state, unsigned long delay_ms){
   }
   delay(delay_ms);
 }
+void LED_cycle_up(bool led_state, unsigned long delay_ms){
+  /*
+  // beginner way
+  WatchOS.LED_write(NUMBER_F(6), led_state);
+  delay(delay_ms);
+  WatchOS.LED_write(NUMBER_F(5), led_state);
+  WatchOS.LED_write(NUMBER_F(7), led_state);
+  delay(delay_ms);
+  WatchOS.LED_write(NUMBER_F(4), led_state);
+  WatchOS.LED_write(NUMBER_F(8), led_state);
+  delay(delay_ms);
+  WatchOS.LED_write(NUMBER_F(3), led_state);
+  WatchOS.LED_write(NUMBER_F(9), led_state);
+  delay(delay_ms);
+  WatchOS.LED_write(NUMBER_F(2), led_state);
+  WatchOS.LED_write(NUMBER_F(10), led_state);
+  delay(delay_ms);
+  WatchOS.LED_write(NUMBER_F(1), led_state);
+  WatchOS.LED_write(NUMBER_F(11), led_state);
+  delay(delay_ms);
+  WatchOS.LED_write(NUMBER_F(12), led_state);
+  */
+  
+  // an expert
+  int led_number = 6;
+  for (int i = 0; i <= 12/2; i++){
+    WatchOS.LED_write(NUMBER_F(led_number-i), led_state);
+    WatchOS.LED_write(NUMBER_F(led_number+i), led_state);
+    delay(delay_ms);
+  }
+  
+}
+void LED_cycle_down(bool led_state, unsigned long delay_ms){
+  int led_number = 12;
+  for (int i = 0; i <= 12/2; i++){
+    WatchOS.LED_write(NUMBER_F(led_number-i), led_state);
+    WatchOS.LED_write(NUMBER_F(i), led_state);
+    delay(delay_ms);
+  }
+}
 #pragma endregion LED
 // ------------------------------------------------------------------
 
@@ -212,12 +252,16 @@ void CONFIG_MENU(){
           FSM_ALIVE_millis = millis();
           WatchOS.LED_clear();
           if(_result == 1){
+            WatchOS.LED_write(NUMBER_F(CONFIG_value), LED_OFF);
             // CONFIG_value++; // 0-5
             CONFIG_value = CONFIG_value % (4+1); // 0-5 only
             CONFIG_value++; // 1-6
 
             DEBUG_F Serial.print("[DEBUG] CONFIG_value: ");
             DEBUG_F Serial.println(CONFIG_value);
+
+            LED_cycle_up(LED_ON, 30);
+            LED_cycle_down(LED_OFF, 30);
 
             WatchOS.LED_write(NUMBER_F(CONFIG_value), LED_ON);
           }else if(_result == 2){
@@ -566,10 +610,7 @@ void CONFIG_TIME(){
 
       WatchOS.RTC_setTime(result_hour, result_minutes, result_seconds);
       
-      LED_all_delay(LED_ON, 100);
-      LED_all_delay(LED_OFF, 100);
-      LED_all_delay(LED_ON, 100);
-      LED_all_delay(LED_OFF, 100);
+      LED_cycle_down(LED_ON, 75);
       WatchOS.LED_clear();
       break;
     }
