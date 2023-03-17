@@ -593,7 +593,7 @@ void DEBUG_FIME(){
     while(1){
       if(millis() - DEBUG_FIME_millis > 1000){
         WatchOS.LED_write(NUMBER_F(3), LED_ON);
-        WatchOS.LED_write(NUMBER_F(8), LED_ON);
+        WatchOS.LED_write(NUMBER_F(6), LED_ON);
         WatchOS.LED_write(NUMBER_F(9), LED_ON);
         WatchOS.LED_write(NUMBER_F(12), LED_ON);
         DEBUG_RTC_led_active = 1;
@@ -618,7 +618,7 @@ void DEBUG_FIME(){
       if(DEBUG_RTC_led_active && (millis() - DEBUG_FIME_led_millis > 100)){
         DEBUG_RTC_led_active = 0;
         WatchOS.LED_write(NUMBER_F(3), LED_OFF);
-        WatchOS.LED_write(NUMBER_F(8), LED_OFF);
+        WatchOS.LED_write(NUMBER_F(6), LED_OFF);
         WatchOS.LED_write(NUMBER_F(9), LED_OFF);
         WatchOS.LED_write(NUMBER_F(12), LED_OFF);
       }
