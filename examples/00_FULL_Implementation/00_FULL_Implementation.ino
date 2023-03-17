@@ -457,10 +457,10 @@ void CONFIG_TIME(){
     delay(500);
     for (int i = 1; i < 5; i++) {
       WatchOS.LED_write(NUMBER_F(CONFIG_CLOCK_minute), LED_ON);
-      WatchOS.LED_write(NUMBER_F((CONFIG_CLOCK_minute+i) % (12+1)), LED_ON);
+      WatchOS.LED_write(NUMBER_F(CONFIG_CLOCK_minute+i) % 12, LED_ON);
       delay(100);
       WatchOS.LED_write(NUMBER_F(CONFIG_CLOCK_minute), LED_ON);
-      WatchOS.LED_write(NUMBER_F((CONFIG_CLOCK_minute+i) % (12+1)), LED_OFF);
+      WatchOS.LED_write(NUMBER_F(CONFIG_CLOCK_minute+i) % 12, LED_OFF);
       delay(100);
     }
 
@@ -486,7 +486,7 @@ void CONFIG_TIME(){
           // LED_write(PIXEL_COLOR_HOUR, CONFIG_CLOCK_hour-1, LED_ON);
           WatchOS.LED_write(NUMBER_F(CONFIG_CLOCK_minute), LED_ON);
           if (CONFIG_value>0)
-            WatchOS.LED_write(NUMBER_F((CONFIG_CLOCK_minute+CONFIG_value) % (12+1)), LED_ON);
+            WatchOS.LED_write(NUMBER_F(CONFIG_CLOCK_minute+CONFIG_value) % 12, LED_ON);
 
           DEBUG_F Serial.print("[DEBUG] CONFIG_value: ");
           DEBUG_F Serial.println(CONFIG_value);
@@ -497,10 +497,10 @@ void CONFIG_TIME(){
       if(CONFIG_state == 1){
         for (int i = 0; i < 2; i++){
           WatchOS.LED_write(NUMBER_F(CONFIG_CLOCK_minute), LED_ON); 
-          WatchOS.LED_write(NUMBER_F((CONFIG_CLOCK_minute+CONFIG_value) % (12+1)), LED_OFF);
+          WatchOS.LED_write(NUMBER_F(CONFIG_CLOCK_minute+CONFIG_value) % 12, LED_OFF);
           delay(100);
           WatchOS.LED_write(NUMBER_F(CONFIG_CLOCK_minute), LED_ON); 
-          WatchOS.LED_write(NUMBER_F((CONFIG_CLOCK_minute+CONFIG_value) % (12+1)), LED_ON); 
+          WatchOS.LED_write(NUMBER_F(CONFIG_CLOCK_minute+CONFIG_value) % 12, LED_ON); 
           delay(100);
         }
         CONFIG_state = 2;
