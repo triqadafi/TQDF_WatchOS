@@ -111,10 +111,12 @@ void loop() {
     WATCH_display_mode(DISPLAY_MODE);
 
     if(WatchOS.BUTTON_isPressed()){
-      LED_all_delay(LED_ON, 100);
-      LED_all_delay(LED_OFF, 100);
-      LED_all_delay(LED_ON, 100);
+      LED_cycle_up(LED_ON, 50);
+    }
 
+    // Enter the menu 
+    // if the button still pressed after the led animation
+    if(WatchOS.BUTTON_isPressed()){
       // make sure the button released
       do{delay(200);} while(WatchOS.BUTTON_isPressed());
       FSM_STATE = 2;
