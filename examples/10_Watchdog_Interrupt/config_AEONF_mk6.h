@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#ifndef APP_COMPATIBILITY
 // ------------------------------------------------------------------
 // PIN Configuration
 // ------------------------------------------------------------------
@@ -7,6 +8,7 @@ int beeper_pin = PBEEPER;
 int led_power_pin = PLED_POWER;
 
 int led_clock_pins[12] = {
+  PLED0,
   PLED1,
   PLED2,
   PLED3,
@@ -17,8 +19,7 @@ int led_clock_pins[12] = {
   PLED8,
   PLED9,
   PLED10,
-  PLED11,
-  PLED12
+  PLED11
 };
 int unused_pins[12] = {
   PUNUSED1,
@@ -43,6 +44,4 @@ int special_pins[6] = {
   PSPECIAL6 // USB D+
 };
 
-
-
-
+#endif
