@@ -65,8 +65,8 @@ void setup() {
   );
   /* USER SETUP CODE 1*/
   WatchOS.LED_setBrightnessMax(50); // brightness: 1-100 percent
-  WatchOS.RTC_initialTime(7,54,30);
-  WatchOS.RTC_initialDate(20,03,23);
+  WatchOS.RTC_initialTime(7,54,30); // CHANGE THIS VALUE -- based on current time: hour, minute, second
+  WatchOS.RTC_initialDate(23,3,23); // CHANGE THIS VALUE -- based on current date: day, month, year (2 digit based)
   WatchOS.WATCHDOG_reconfigureWakeUp(true);
 
   /* END USER SETUP CODE 1*/
