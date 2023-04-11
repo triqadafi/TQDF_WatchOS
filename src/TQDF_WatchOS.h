@@ -9,6 +9,7 @@
 #include <Arduino.h>
 #include "STM32LowPower.h"
 #include "STM32RTC.h"
+#include "TQDF_AppCompatibility.h"
 
 #ifndef TQDF_WatchOS_h
 #define TQDF_WatchOS_h
@@ -16,7 +17,6 @@
 // ------------------------------------------------------------------
 // TQDF_WatchOS HELPER
 // ------------------------------------------------------------------
-#define NUMBER_F(x) (x-1)
 #define REPLACE_WITH_YOUR_CALIBRATION_VALUE 0
 
 // Debug Flag
