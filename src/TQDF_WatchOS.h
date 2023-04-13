@@ -170,10 +170,18 @@ class TQDF_WatchOS
     void shutdown();
 
     /**
+     * @brief Enter recovery by software
+     * @param None
+     * @return None
+     * @note Once entered the it will detected as STM32 BOOTLOADER on device manager
+     */
+    void recovery();
+
+    /**
      * @brief Enter bootloader as HID device to download the program.
      * @param None
      * @return None
-     * @note Once entered, there is no way to exit the bootloader except pressing the reset button or power cycle the device
+     * @note This is driverless mode, the COM port is not detected and it will detected as TQDFCore Bootloader (on windows check Bluetooth and Devices)
      */
     void bootloader();
 
