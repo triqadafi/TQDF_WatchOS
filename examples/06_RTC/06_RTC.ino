@@ -55,7 +55,7 @@ void setup() {
 
 /* USER APP CODE 1*/
 void loop() {
-  WatchOS.LED_toggle(NUMBER_F(12)); // just tell the whatchdog that we are aware
+  WatchOS.LED_toggle(0); // just tell the whatchdog that we are aware
   
   WatchOS.RTC_update();
   int hourvalue = WatchOS.RTC_getHour();

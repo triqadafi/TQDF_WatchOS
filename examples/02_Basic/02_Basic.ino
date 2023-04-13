@@ -49,9 +49,9 @@ void setup() {
 /* USER APP CODE 1*/
 void loop() {
   // put your main code here, to run repeatedly:
-  WatchOS.LED_write(2, LED_ON);
-  WatchOS.LED_write(5, LED_ON);
-  WatchOS.LED_write(8, LED_ON);
-  WatchOS.LED_write(11, LED_ON);
+  WatchOS.LED_write(0, LED_ON);
+  WatchOS.LED_write(3, LED_ON);
+  WatchOS.LED_write(6, LED_ON);
+  WatchOS.LED_write(9, LED_ON);
 }
 /* END USER APP CODE 1*/

@@ -85,15 +85,15 @@ void WATCH_display_time(){
   int result_minute_remainder = clock_minute % 5;
 
   // show hour hand
-  WatchOS.LED_write(NUMBER_F(result_hour), LED_ON);
+  WatchOS.LED_write(result_hour, LED_ON);
   delay(500);
 
   // show minute hand
   if(result_minute == result_hour){ // if minute sama as hour just turn off a little to see the transition
-    WatchOS.LED_write(NUMBER_F(result_minute), LED_OFF);
+    WatchOS.LED_write(result_minute, LED_OFF);
     delay(200);
   }
-  WatchOS.LED_write(NUMBER_F(result_minute), LED_ON);
+  WatchOS.LED_write(result_minute, LED_ON);
   delay(2000);
   WatchOS.LED_clear();
 
@@ -102,11 +102,11 @@ void WATCH_display_time(){
     int _plusminute = result_minute+i+1;
     if(_plusminute > 12) _plusminute -= 12;
     
-    WatchOS.LED_write(NUMBER_F(result_minute), LED_ON);
-    WatchOS.LED_write(NUMBER_F(_plusminute), LED_ON);
+    WatchOS.LED_write(result_minute, LED_ON);
+    WatchOS.LED_write(_plusminute, LED_ON);
     delay(250);
-    WatchOS.LED_write(NUMBER_F(result_minute), LED_ON);
-    WatchOS.LED_write(NUMBER_F(_plusminute), LED_OFF);
+    WatchOS.LED_write(result_minute, LED_ON);
+    WatchOS.LED_write(_plusminute, LED_OFF);
     delay(250);
   }
   WatchOS.LED_clear();
@@ -115,9 +115,9 @@ void WATCH_display_time(){
   // show second
   // int result_second = ((clock_second/10) * 2) + 2; // +2 means the maximum tolerenace of the clock 
   // if(result_second > 0){
-  //   WatchOS.LED_write(NUMBER_F(result_second), LED_ON);
+  //   WatchOS.LED_write(result_second, LED_ON);
   // }else{
-  //   WatchOS.LED_write(NUMBER_F(12), LED_ON);
+  //   WatchOS.LED_write(12, LED_ON);
   // }
   // delay(1000);
   // WatchOS.LED_clear();

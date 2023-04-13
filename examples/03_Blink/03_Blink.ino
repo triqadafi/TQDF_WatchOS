@@ -51,21 +51,15 @@ void setup() {
 /* USER APP CODE 1*/
 void loop() {
   // normal way
-  WatchOS.LED_write(11, LED_ON);
+  WatchOS.LED_write(0, LED_ON);
   delay(1000);
-  WatchOS.LED_write(11, LED_OFF);
-  delay(1000);
-  
-  // or you can use number
-  WatchOS.LED_write(NUMBER_F(12), LED_ON);
-  delay(1000);
-  WatchOS.LED_write(NUMBER_F(12), LED_OFF);
+  WatchOS.LED_write(0, LED_OFF);
   delay(1000);
 
   // or using toggle 
-  WatchOS.LED_toggle(NUMBER_F(12));
+  WatchOS.LED_toggle(0);
   delay(1000);
-  WatchOS.LED_toggle(NUMBER_F(12));
+  WatchOS.LED_toggle(0);
   delay(1000);
 }
 /* END USER APP CODE 1*/
