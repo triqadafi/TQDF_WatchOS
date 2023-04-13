@@ -52,10 +52,10 @@ void setup() {
 void loop() {
   // WATCHDOG: 10 second of inactivity will shutdown the device!!!
   // uncomment the program below if you dont want catched by the WATCHDOG
-  WatchOS.LED_write(NUMBER_F(12), LED_ON); // just tell the whatchdog that we are aware
+  WatchOS.LED_write(0, LED_ON); // just tell the whatchdog that we are aware
 
   if (WatchOS.WATCHDOG_isInterruptFlag()){
-    WatchOS.LED_toggle(NUMBER_F(6));
+    WatchOS.LED_toggle(6);
     Serial.println(".");
     WatchOS.WATCHDOG_clearInterruptFlag();
   }

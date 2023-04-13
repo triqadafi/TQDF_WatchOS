@@ -56,13 +56,13 @@ void loop() {
   if(WatchOS.BUTTON_isPressed()){
   // if(WatchOS.BUTTON_isSafePressed(50)){ // this function is using debaoucer with time window of 50 ms
     Serial.println("Button is pressed!");
-    WatchOS.LED_write(NUMBER_F(3), LED_ON);
-    WatchOS.LED_write(NUMBER_F(9), LED_ON);
+    WatchOS.LED_write(3, LED_ON);
+    WatchOS.LED_write(9, LED_ON);
     delay(200);
   }else{
     Serial.println("Press the button!");
-    WatchOS.LED_write(NUMBER_F(3), LED_OFF);
-    WatchOS.LED_write(NUMBER_F(9), LED_OFF);
+    WatchOS.LED_write(3, LED_OFF);
+    WatchOS.LED_write(9, LED_OFF);
     delay(200);
   }
 }

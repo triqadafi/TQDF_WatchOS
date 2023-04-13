@@ -63,10 +63,10 @@ void setup() {
 /* USER APP CODE 1*/
 void loop() {
   if (WatchOS.WATCHDOG_isInterruptFlag()){
-    WatchOS.LED_toggle(NUMBER_F(12));
-    WatchOS.LED_toggle(NUMBER_F(9));
-    WatchOS.LED_toggle(NUMBER_F(6));
-    WatchOS.LED_toggle(NUMBER_F(3));
+    WatchOS.LED_toggle(0);
+    WatchOS.LED_toggle(3);
+    WatchOS.LED_toggle(6);
+    WatchOS.LED_toggle(9);
     WatchOS.WATCHDOG_clearInterruptFlag();
   }
 

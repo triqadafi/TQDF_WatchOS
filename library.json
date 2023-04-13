@@ -7,7 +7,7 @@
     "type": "git",
     "url": "https://github.com/triqadafi/TQDF_WatchOS"
   },
-  "version": "1.4.0",
+  "version": "1.4.1",
   "frameworks": "arduino",
   "platforms": "ststm32",
   "build": {

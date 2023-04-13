@@ -78,11 +78,11 @@ void loop() {
     WatchOS.shutdown();
   }
 
-  WatchOS.LED_write(NUMBER_F(3), LED_ON);
-  WatchOS.LED_write(NUMBER_F(9), LED_ON);
+  WatchOS.LED_write(3, LED_ON);
+  WatchOS.LED_write(9, LED_ON);
   delay(25);
-  WatchOS.LED_write(NUMBER_F(3), LED_OFF);
-  WatchOS.LED_write(NUMBER_F(9), LED_OFF);
+  WatchOS.LED_write(3, LED_OFF);
+  WatchOS.LED_write(9, LED_OFF);
   delay(25);
 
   if(WatchOS.BUTTON_isSafePressed(50)){
