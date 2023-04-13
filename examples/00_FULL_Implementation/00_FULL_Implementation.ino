@@ -15,7 +15,7 @@
 #define FSM_ALIVE_MS 30000 // when entering config exit after 30s inactivity
 
 /* END USER DEFINE*/
-#define APP_COMPATIBILITY // ENABLE ONLY IF YOU HAVE BETA TEST BOARD
+// #define APP_COMPATIBILITY // ENABLE ONLY IF YOU HAVE BETA TEST BOARD
 #include "TQDF_WatchOS.h"
 #include "config_AEONF_mk6.h"
 
