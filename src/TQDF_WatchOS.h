@@ -66,7 +66,7 @@ class TQDF_WatchOS
       WAKE_DISABLED,
       /// 1 Second (Beware if you using 1 second interval with shutdown)
       WAKE_EVERY_1S,
-      /// 5 Second
+      /// 5 Seconds
       WAKE_EVERY_5S,
       /// 10 Seconds
       WAKE_EVERY_10S,
@@ -75,7 +75,9 @@ class TQDF_WatchOS
       /// 5 Minutes
       WAKE_EVERY_5M,
       /// 15 Minutes
-      WAKE_EVERY_15M
+      WAKE_EVERY_15M,
+      /// 1 Hour
+      WAKE_EVERY_1H
     };
 
     /**
@@ -329,6 +331,15 @@ class TQDF_WatchOS
     void RTC_setDate(uint8_t day, uint8_t month, uint8_t year);
 
     /**
+     * @brief Set Date and Time based on compiler timer
+     * @param  date: Compiler macro __DATE__
+     * @param  time: Compoler macro __TIME__
+     * @return None
+     * @note This function will executed directly.
+     */
+    void RTC_initialDateTime(char const *date, char const *time, uint32_t second_tolerance);
+
+    /**
      * @brief Adjust or fine tune the Real Time Clock (RTC) calibration value.
      * @param diff Fine tune adjustment for the user.
      * @return None
@@ -473,6 +484,8 @@ class TQDF_WatchOS
     void WATCHDOG_clearInterruptFlag();
 
     unsigned long getUID(int index);
+
+    uint32_t TEST_return();
 };
 
 extern TQDF_WatchOS WatchOS;
