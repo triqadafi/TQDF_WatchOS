@@ -55,7 +55,7 @@ void setup() {
     /* Serial Baudrate:  */ 115200, // 9600 or 115200
     /* RTC Preserved     */ true, 
     /* RTC Callibration: */ REPLACE_WITH_YOUR_CALIBRATION_VALUE, // From manufacturer (back of the PCB)
-    /* WATCHDOG Routine  */ WatchOS.WAKE_EVERY_15M,
+    /* WATCHDOG Routine  */ WatchOS.WAKE_DISABLED, // always power cycle the device after changing the watchdoh setting, otherwise it may stuck
     /* GPIO -------------------------------------------------------------------*/ 
     /* Clock pin (1-12): */ led_clock_pins, 
     /* LED Power pin:    */ led_power_pin, 
@@ -65,10 +65,14 @@ void setup() {
   );
   /* USER SETUP CODE 1*/
   WatchOS.LED_setBrightnessMax(50); // brightness: 1-100 percent
-  WatchOS.RTC_initialTime(7,54,30);
-  WatchOS.RTC_initialDate(20,03,23);
+  // USE Compiler Date and Time
+  // please press the reset button after upload to apply the change
+  WatchOS.RTC_initialDateTime(__DATE__, __TIME__, 10);
+  // OR Set manually
+  // WatchOS.RTC_initialTime(7,54,30);
+  // WatchOS.RTC_initialDate(20,03,23);
+  
   WatchOS.WATCHDOG_reconfigureWakeUp(true);
-
   /* END USER SETUP CODE 1*/
 }
 /* USER APP CODE 1*/
