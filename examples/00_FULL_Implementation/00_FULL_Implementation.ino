@@ -709,25 +709,30 @@ void WATCH_TIME_mode_normal(int hour, int minute, int second){
 
     // show minute hand
     if(result_minute == result_hour){ // if minute sama as hour just turn off a little to see the transition
-      WatchOS.LED_write(result_minute, LED_OFF);
+      WatchOS.LED_write(result_hour, LED_OFF);
       delay(200);
     }
     WatchOS.LED_write(result_minute, LED_ON);
-    delay(2000);
-    WatchOS.LED_clear();
+    delay(1500);
 
     // show plus hand
-    for (int i = 0; i < result_minute_remainder; i++){
-      int _plusminute = (result_minute+i+1) % 12;
-      
+    if(SHOW_PLUSMINUTE && result_minute_remainder > 0){
+      WatchOS.LED_clear();
       WatchOS.LED_write(result_minute, LED_ON);
-      WatchOS.LED_write(_plusminute, LED_ON);
-      delay(250);
-      WatchOS.LED_write(result_minute, LED_ON);
-      WatchOS.LED_write(_plusminute, LED_OFF);
-      delay(250);
+      delay(500);
+
+      for (int i = 0; i < result_minute_remainder; i++){
+        int _plusminute = (result_minute+i+1) % 12;
+        
+        WatchOS.LED_write(result_minute, LED_ON);
+        WatchOS.LED_write(_plusminute, LED_ON);
+        delay(250);
+        WatchOS.LED_write(result_minute, LED_ON);
+        WatchOS.LED_write(_plusminute, LED_OFF);
+        delay(250);
+      }
+      WatchOS.LED_clear();
     }
-    WatchOS.LED_clear();
     // delay(1000);
 
     // show second
