@@ -802,9 +802,7 @@ void WATCH_TIME_mode_decimal1(int hour, int minute, int second){
 #endif
 }
 void WATCH_TIME_mode_decimal2(int hour, int minute, int second){
-  if(hour > 12) hour -= 12;
-  // int clock_hour_tens = (hour/10)%10; 
-  // int clock_hour_unit = hour%10;
+  hour = hour % 12;
   int clock_minute_tens = (minute/10)%10; 
   int clock_minute_unit = minute%10;
   int clock_second_tens = (second/10)%10; 
@@ -821,14 +819,6 @@ void WATCH_TIME_mode_decimal2(int hour, int minute, int second){
   DEBUG_F Serial.print("-");
   DEBUG_F Serial.print(clock_second_unit);
   DEBUG_F Serial.println();
-
-  // replace 0 with 12 before displaying
-  // if(clock_hour_tens == 0) clock_hour_tens = 12; 
-  // if(clock_hour_unit == 0) clock_hour_unit = 12; 
-  if(clock_minute_tens == 0) clock_minute_tens = 12; 
-  if(clock_minute_unit == 0) clock_minute_unit = 12; 
-  if(clock_second_tens == 0) clock_second_tens = 12; 
-  if(clock_second_unit == 0) clock_second_unit = 12; 
 
   WatchOS.LED_write(hour, LED_ON);
   delay(500);
