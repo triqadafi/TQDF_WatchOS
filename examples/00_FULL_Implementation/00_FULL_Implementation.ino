@@ -364,7 +364,6 @@ void CONFIG_MENU(){
 #pragma region CONFIG_DECIMAL
 // ------------------------------------------------------------------
 void CONFIG_DECIMAL(int* variable, int value_min, int value_max){
-
   // loop
   CONFIG_millis = millis();
   CONFIG_state = 0;
@@ -374,13 +373,18 @@ void CONFIG_DECIMAL(int* variable, int value_min, int value_max){
   int decimal_state = 0;
   int decimal_max = 0;
   int decimal_min = 0;
+  unsigned long led_millis = 0;
 
   while (1) {
     // avoid using loop
     if(CONFIG_state == 0){
+      do{delay(200);} while(WatchOS.BUTTON_isPressed());
+      WatchOS.BUTTON_read(); // double read means reset the state
+      WatchOS.BUTTON_read(); // double read means reset the state
+      
       if(decimal_state == 0){
         config_value = *variable/10;
-      }else if(decimal_state == 0){
+      }else if(decimal_state == 1){
         if(result_value < *variable){
           config_value = *variable % 10;
         }else{
@@ -395,34 +399,46 @@ void CONFIG_DECIMAL(int* variable, int value_min, int value_max){
       CONFIG_state = 1;
     }
     if(CONFIG_state == 1){
-      // BUTTON
-      int _result = WatchOS.BUTTON_getResult();
-      if(_result > 0){
-        FSM_ALIVE_millis = millis();
-        if(_result == 1){
-
-          if(decimal_state == 0){
-            decimal_max = value_max / 10;
-            decimal_min = 0;
-          } else
-          if(decimal_state == 1){
-             decimal_max = min(value_max - result_value, 9);
-             decimal_min = 0;
-          }
-
-          config_value++; // 0-11
-          if(config_value > decimal_max){
-            config_value = decimal_min;
-          }
-        }else if(_result == 2){
-          CONFIG_state = 2;
+      if(decimal_state == 1){
+        if (millis() - led_millis > 50) {
+          led_millis = millis();
+          WatchOS.LED_toggle(config_value);
         }
-
+      }
+      // BUTTON
+      uint8_t numOfPresses = WatchOS.BUTTON_multiPressRead();
+      // WatchOS.BUTTON_read();               // read the button
+      if (!WatchOS.BUTTON_isPressed() && numOfPresses > 0){
+        FSM_ALIVE_millis = millis();
+        if(decimal_state == 0){
+          decimal_max = value_max / 10;
+          decimal_min = 0;
+        } else
+        if(decimal_state == 1){
+            decimal_max = min(value_max - result_value, 9);
+            decimal_min = 0;
+        }
+        if(numOfPresses == 3){
+          config_value--; // 0-11
+        }else{
+          config_value++; // 0-11
+        }
+        if(config_value > decimal_max){
+          config_value = decimal_min;
+        }
+        if(config_value < decimal_min){
+          config_value = decimal_max;
+        }
         WatchOS.LED_write(config_value_last, LED_OFF);
         WatchOS.LED_write(config_value, LED_ON);
         config_value_last = config_value;
-
         DEBUG_F Serial.print("[DEBUG] config_value: ");
+        DEBUG_F Serial.println(config_value);
+      }
+      if (WatchOS.BUTTON_pressedFor()){
+        FSM_ALIVE_millis = millis();
+        CONFIG_state = 2;
+        DEBUG_F Serial.print("[DEBUG] config_value (confirmed): ");
         DEBUG_F Serial.println(config_value);
       }
     }
