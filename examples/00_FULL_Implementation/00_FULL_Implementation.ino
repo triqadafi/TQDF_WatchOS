@@ -36,7 +36,8 @@ int CONFIG_value = 0;
 unsigned long CONFIG_millis = 0;
 
 int CONFIG_MENU_index = 0;
-int CONFIG_MENU_max = 5;
+int CONFIG_MENU_min = 1;
+int CONFIG_MENU_max = 6;
 int CONFIG_CLOCK_hour = 0;
 int CONFIG_CLOCK_minute = 0;
 int CONFIG_CLOCK_plusminute = 0;
@@ -312,15 +313,25 @@ void CONFIG_MENU(){
       // avoid using loop
       if(CONFIG_state == 0){
         // BUTTON
-        int _result = WatchOS.BUTTON_getResult();
-        if(_result > 0){
+        uint8_t _result = WatchOS.BUTTON_multiPressRead();
+
+        if (!WatchOS.BUTTON_isPressed() && _result > 0){
           FSM_ALIVE_millis = millis();
           WatchOS.LED_clear();
-          if(_result == 1){
+
             WatchOS.LED_write(CONFIG_value, LED_OFF);
-            // CONFIG_value++; // 0-5
-            CONFIG_value = CONFIG_value % (CONFIG_MENU_max + 1); // 0-6 only
-            CONFIG_value++; // 1-6
+
+            if(_result == 3){
+              CONFIG_value--; // 0-11
+            }else{
+              CONFIG_value++; // 0-11
+            }
+            if(CONFIG_value > CONFIG_MENU_max){
+              CONFIG_value = CONFIG_MENU_min;
+            }
+            if(CONFIG_value < CONFIG_MENU_min){
+              CONFIG_value = CONFIG_MENU_max;
+            }
 
             DEBUG_F Serial.print("[DEBUG] CONFIG_value: ");
             DEBUG_F Serial.println(CONFIG_value);
@@ -329,7 +340,8 @@ void CONFIG_MENU(){
             LED_cycle_down(LED_OFF, 30);
 
             WatchOS.LED_write(CONFIG_value, LED_ON);
-          }else if(_result == 2){
+        }
+        if (WatchOS.BUTTON_pressedFor()){
             CONFIG_MENU_index = CONFIG_value;
 
             DEBUG_F Serial.print("[DEBUG] CONFIG_MENU: ");
@@ -338,7 +350,6 @@ void CONFIG_MENU(){
             CONFIG_state = 1;
 
             WatchOS.LED_write(CONFIG_value, LED_ON);
-          }
         }
       }
       if(CONFIG_state == 1){
@@ -369,13 +380,14 @@ void CONFIG_DECIMAL(int* variable, int value_min, int value_max){
   CONFIG_millis = millis();
   CONFIG_state = 0;
   int config_value_last = 0;
-  int config_value = 0;
+  int config_value = *variable/10;
   int result_value = 0;
   int decimal_state = 0;
   int decimal_max = 0;
   int decimal_min = 0;
   unsigned long led_millis = 0;
 
+  WatchOS.LED_write(config_value, LED_ON);
   while (1) {
     // avoid using loop
     if(CONFIG_state == 0){
