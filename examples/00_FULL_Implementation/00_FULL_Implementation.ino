@@ -153,9 +153,21 @@ void loop() {
       case 3:
         WATCH_DATE_mode(0);
         break;
-
-    if(FSM_DISPLAY_mode == 0) WATCH_TIME_mode(DISPLAY_MODE);
-    if(FSM_DISPLAY_mode == 1) WATCH_DATE_mode(0);
+      case 4:
+        WatchOS.LED_write(4, LED_ON);
+        delay(500);
+        for (int i = 0; i < 2; i++){
+          WatchOS.LED_write(WatchOS.WATCHDOG_reconfigureWakeUpStatus(), LED_ON);
+          delay(200);
+          WatchOS.LED_write(WatchOS.WATCHDOG_reconfigureWakeUpStatus(), LED_OFF);
+          delay(200);
+        }
+        break;
+      case 5:
+        WatchOS.LED_write(5, LED_ON);
+        delay(1000);
+        break;
+    }
 
     if(WatchOS.BUTTON_isPressed()){
       LED_cycle_up(LED_ON, 50);
