@@ -70,11 +70,12 @@ void setup() {
   // TIME ADJUSTMENT
   // USE Compiler Date and Time
   // please press the reset button after upload to apply the change
-  WatchOS.RTC_initialDateTime(__DATE__, __TIME__, 10); // 10 is the additional time because of the upload process
+  WatchOS.RTC_initialDateTime(__DATE__, __TIME__, 10); // 10 is the additional time for the upload process
   // OR Set manually
   // WatchOS.RTC_initialTime(7,54,30); // CHANGE THIS VALUE -- based on current time: hour, minute, second
   // WatchOS.RTC_initialDate(23,3,23); // CHANGE THIS VALUE -- based on current date: day, month, year (2 digit based)
 
+  WatchOS.WATCHDOG_reconfigureWakeUp(true); // allow wakeup reconfiguration access from lato-lato menu
   /* END USER SETUP CODE 1*/
 }
 /* USER APP CODE 1*/
