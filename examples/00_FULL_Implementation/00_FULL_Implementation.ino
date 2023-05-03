@@ -25,8 +25,6 @@
 // ------------------------------------------------------------------
 int FSM_STATE = 0;
 unsigned long FSM_ALIVE_millis = 0;
-int FSM_CLICK_count = 0;
-unsigned long FSM_CLICK_millis = 0;
 int FSM_DISPLAY_mode = 0;
 
 // ------------------------------------------------------------------
@@ -47,6 +45,8 @@ int CONFIG_CLOCK_second = 0;
 int CONFIG_DATE_year = 0;
 int CONFIG_DATE_month = 0;
 int CONFIG_DATE_day = 0;
+
+bool SHOW_PLUSMINUTE = false;
 
 /* END USER VARIABLE*/
 
@@ -119,32 +119,40 @@ void loop() {
   FSM_begin();
 
   // ------------------------------------------------------------
-  // DISPLAY TIME
+  // DETECT WAKE BUTTON BEHAVIOR
   // ------------------------------------------------------------
   // detect double click
   if(FSM_STATE == 0){
-    while (1){
-      if(millis() - FSM_CLICK_millis < 200){
-        if(WatchOS.BUTTON_isPressed()){
-          FSM_CLICK_count++;
-        }
-      }else{
-        if(FSM_CLICK_count < 1){
-          FSM_DISPLAY_mode = 0;
-        }else{
-          FSM_DISPLAY_mode = 1;
-        }
-        FSM_STATE = 1;
+    WatchOS.BUTTON_simulatePress(); // just to make the wake press counted
+    while(true){
+      uint8_t numOfPresses = WatchOS.BUTTON_multiPressRead();
+      if(numOfPresses > 0){
+        FSM_DISPLAY_mode = numOfPresses;
         break;
       }
     }
-    
+    FSM_STATE = 1;
   }
 
-  // display the time
+  // ------------------------------------------------------------
+  // DISPLAY MODE
+  // ------------------------------------------------------------
   if(FSM_STATE == 1){
     // make sure the button released
     do{delay(200);} while(WatchOS.BUTTON_isPressed());
+    switch (FSM_DISPLAY_mode){
+      default:
+      case 1:
+        SHOW_PLUSMINUTE = false;
+        WATCH_TIME_mode(DISPLAY_MODE);
+        break;
+      case 2:
+        SHOW_PLUSMINUTE = true;
+        WATCH_TIME_mode(DISPLAY_MODE);
+        break;
+      case 3:
+        WATCH_DATE_mode(0);
+        break;
 
     if(FSM_DISPLAY_mode == 0) WATCH_TIME_mode(DISPLAY_MODE);
     if(FSM_DISPLAY_mode == 1) WATCH_DATE_mode(0);
@@ -201,7 +209,6 @@ void loop() {
 void FSM_begin(){
   FSM_STATE = 0;
   FSM_ALIVE_millis = millis();
-  FSM_CLICK_millis = millis();
 }
 
 bool FSM_timeout(unsigned long ms){
