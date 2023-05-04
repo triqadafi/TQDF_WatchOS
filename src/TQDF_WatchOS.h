@@ -479,13 +479,25 @@ class TQDF_WatchOS
      */
     bool WATCHDOG_isInterruptFlag();
 
+
+    // Experimental and undocumented functions
     void WATCHDOG_interrupt_handler();
 
     void WATCHDOG_clearInterruptFlag();
 
+    bool WATCHDOG_reconfigureWakeUpStatus();
+    
     unsigned long getUID(int index);
 
     uint32_t TEST_return();
+
+    void BUTTON_simulatePress();
+    uint8_t BUTTON_multiPressRead();
+    bool BUTTON_releasedFor();
+    bool BUTTON_pressedFor();
+    bool BUTTON_wasPressed();
+    bool BUTTON_wasReleased();
+    bool BUTTON_read();
 };
 
 extern TQDF_WatchOS WatchOS;
