@@ -17,7 +17,7 @@
 
 // #define APP_COMPATIBILITY // ENABLE ONLY IF YOU HAVE BETA TEST BOARD
 #include "TQDF_WatchOS.h"
-#include "config_AEONF_mk6.h"
+#include "config_AEONF.h"
 
 /* USER VARIABLE and PROTOTYPES */
 
