@@ -1,3 +1,6 @@
+// LAST UPDATE
+// Wed, Apr 3, 2024, 11:38:57 AM -------------------------------------
+
 #include <Arduino.h>
 
 /*
@@ -54,7 +57,7 @@ bool SHOW_PLUSMINUTE = false;
 void setup() {
   WatchOS.config(
     /* Serial Baudrate:  */ 115200, // 9600 or 115200
-    /* RTC Preserved     */ true, 
+    /* RTC Preserved     */ false, 
     /* RTC Callibration: */ REPLACE_WITH_YOUR_CALIBRATION_VALUE, // From manufacturer (back of the PCB)
     /* WATCHDOG Routine  */ WatchOS.WAKE_DISABLED, // always power cycle the device after changing the watchdoh setting, otherwise it may stuck
     /* GPIO -------------------------------------------------------------------*/ 
@@ -71,10 +74,10 @@ void setup() {
   // TIME ADJUSTMENT
   // USE Compiler Date and Time
   // please press the reset button after upload to apply the change
-  WatchOS.RTC_initialDateTime(__DATE__, __TIME__, 10); // 10 is the additional time for the upload process
+  // WatchOS.RTC_initialDateTime(__DATE__, __TIME__, 10); // 10 is the additional time for the upload process
   // OR Set manually
-  // WatchOS.RTC_initialTime(7,54,30); // CHANGE THIS VALUE -- based on current time: hour, minute, second
-  // WatchOS.RTC_initialDate(23,3,23); // CHANGE THIS VALUE -- based on current date: day, month, year (2 digit based)
+  WatchOS.RTC_initialTime(7,54,30); // CHANGE THIS VALUE -- based on current time: hour, minute, second
+  WatchOS.RTC_initialDate(23,3,23); // CHANGE THIS VALUE -- based on current date: day, month, year (2 digit based)
 
   WatchOS.WATCHDOG_reconfigureWakeUp(true); // allow wakeup reconfiguration access from lato-lato menu
   /* END USER SETUP CODE 1*/
@@ -775,7 +778,7 @@ void WATCH_TIME_mode_normal(int hour, int minute, int second){
         WatchOS.LED_write(result_minute, LED_ON);
         WatchOS.LED_write(_plusminute, LED_ON);
         delay(250);
-        WatchOS.LED_write(result_minute, LED_ON);
+        WatchOS.LED_write(result_minute, (i == result_minute_remainder-1)?LED_OFF:LED_ON);
         WatchOS.LED_write(_plusminute, LED_OFF);
         delay(250);
       }
